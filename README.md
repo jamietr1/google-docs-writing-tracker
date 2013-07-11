@@ -21,7 +21,7 @@ months and it was designed around my workstyle. People have asked that I make th
 that, but I have no time to support it. Feel free to email me with questions, but there is no guarantee that I will
 be able to reply, or answer the questions. Again, sorry about this.
 
-== Configuration ==
+<strong>Configuration</strong>
 
 The writing tracker depends on you doing all of your writing within a single folder in Google Docs. Call this
 folder your "Sandbox". Inside your sandbox you should keep all of your working documents. Also inside the 
@@ -37,7 +37,7 @@ refer to it by it's file ID as opposed to its name. However, the spreadsheet MUS
 This is where the daily word counts will be recorded. My spreadsheet is called "Writing Data" and I keep it in an
 "Analytics" folder in Google Docs.
 
-=== Setup ===
+<strong>Setup</strong>
 
 Please follow these instructions carefully. Getting a step wrong will likely cause the scripts to fail.
 
@@ -105,7 +105,7 @@ that you want captured in your daily word count, but sure to put the document in
 where the script looks for documents and it is from here that it makes archival copies into the Earlier folder
 so that is can produce a difference file.
 
-CAUTION: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-
+<strong><font color="red">CAUTION</font></strong>: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-
 written each night. When you go to edit a file in your Sandbox, BE SURE THAT IS IT IN YOUR SANDBOX FOLDER and NOT
 the EARLIER folder.
 
