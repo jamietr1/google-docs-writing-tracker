@@ -69,7 +69,20 @@ II. Script Setup
   3. Copy the code from "writing_stats.gs" (in GitHub) and paste it into the code.gs file.
   4. Create a new script file (File->New->Script File) and call it diff.gs.
   5. Copy the code from "diff.gs" (in GitHub) and paste it into the diff.gs file.
-  6. Go into the "code.gs" script.
+  6. Go into the "code.gs" script. There are four values that must be updated:
+
+      var en_add = "<EMAIL ADDRESS>" -- replace with the email address you want the daily writing
+                                        to be sent. (You can use your Evernote email if you want it
+                                        to go to Evernote
+
+      var SANDBOX = "Sandbox";       -- this is the name of your sandbox folder. I recommend using
+                                        this name.
+    
+      var PREV_FOLDER = "Sandbox/Earlier"; -- this is the name of your "Earlier" folder. I recommend
+                                              using this name.
+
+      var QS_FILE = "<file Id>";     -- this is the file ID you recorded
+                                        above in step I-1-d
 
 You should have a Google App Script project now, with 2 scripts in it, code.gs and diff.gs.
 
