@@ -15,10 +15,12 @@ exactly what you wrote each day, what changes you made, what you added and what 
 The writing tracker depends on a very specific configuration so please be sure to read the setup instructions
 below.
 
+<strong>A note on the (lack of) support</strong>
+
 Keep in mind that I originally developed this code for me, without thinking others would be using it. If it seems
 cumbersome to setup, sorry! Also, <strong>USE IT AT YOUR OWN RISK</strong>. It works well for me, but I've been using it for
 months and it was designed around my workstyle. People have asked that I make the code available, and I have done
-that, but I have no time to support it. Feel free to email me with questions, but there is no guarantee that I will
+that, but I have no time to support it. Feel free to email me at feedback [at] jamietoddrubin dot com with questions, but there is no guarantee that I will
 be able to reply, or answer the questions. Again, sorry about this.
 
 <strong>Configuration</strong>
