@@ -47,9 +47,9 @@ I. File System Setup
 
   1. Create a Google Spreadsheet to store your writing data.
 
-      a. Name the first tab in the spreadsheet "Writing"
-      b. Give cell A1 the label "Date"
-      c. Give cell B2 the label "Words"
+      a. Name the first tab in the spreadsheet "Writing"<br />
+      b. Give cell A1 the label "Date"<br />
+      c. Give cell B2 the label "Words"<br />
       d. Record the file ID of the spreadsheet. You can do this by copying it from the file URL:
       
          If your URL looks like this:
