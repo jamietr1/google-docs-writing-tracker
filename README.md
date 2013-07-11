@@ -1,7 +1,7 @@
 google-docs-writing-tracker
 ===========================
 
-== Overview ==
+<strong>Overview</strong>
 
 The Google Docs writing tracker automates the process of logging how much you write each day. It does 3 main things:
 
