@@ -115,9 +115,9 @@ because I am generally done for the day and I want the script to capture the day
 owls and want the script to run at other times. That's fine, but depending on when you run it, you might have to
 alter the date of the files the script looks for. Again, this was written with me and my habits in mind.
 
-<strong><font color="red">CAUTION</font></strong>: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-
-written each night. When you go to edit a file in your Sandbox, BE SURE THAT IS IT IN YOUR SANDBOX FOLDER and NOT
-the EARLIER folder.
+<strong>CAUTION</strong>: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-
+written each night. When you go to edit a file in your Sandbox, be sure you are editing the Sandbox version and 
+not the Sandbox/Earlier version. Changes to the latter will likely be overwritten by the script.
 
 I made my Sandbox folder a starred folder and have a shortcut to that folder that I use so that I don't
 accidentally edit the earlier version of the file and lose my changes.
