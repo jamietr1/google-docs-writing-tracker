@@ -20,7 +20,7 @@ var SANDBOX = "Sandbox";
 
 // The FILE ID (see documentation) of your Google Spreadsheet containing your writing data goes here
 // I use the file "Analytics/Writing Data"
-var QS_FILE = "0AmEvY6JjICyzdFM1aUVCd0hvZmxmT185MGE0R0hrdWc"; 
+var QS_FILE = "<file id>"; 
 
 var daily_diff = "";
 
