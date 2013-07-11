@@ -15,6 +15,12 @@ exactly what you wrote each day, what changes you made, what you added and what 
 The writing tracker depends on a very specific configuration so please be sure to read the setup instructions
 below.
 
+Keep in mind that I originally developed this code for me, without thinking others would be using it. If it seems
+cumbersome to setup, sorry! Also, USE IT AT YOUR OWN RISK. It works well for me, but I've been using it for
+months and it was designed around my workstyle. People have asked that I make the code available, and I have done
+that, but I have no time to support it. Feel free to email me with questions, but there is no guarantee that I will
+be able to reply, or answer the questions. Again, sorry about this.
+
 == Configuration ==
 
 The writing tracker depends on you doing all of your writing within a single folder in Google Docs. Call this
@@ -60,9 +66,36 @@ II. Script Setup
 
   1. Create a new Script file called "WritingStats"
   2. When prompted for the type of project, select "Blank Project"
-  3. 
-  4. 
-  2. Move the "WritingStats" file into your "Scripts" folder.
-  3. 
-            
+  3. Copy the code from "writing_stats.gs" (in GitHub) and paste it into the code.gs file.
+  4. Create a new script file (File->New->Script File) and call it diff.gs.
+  5. Copy the code from "diff.gs" (in GitHub) and paste it into the diff.gs file.
+  6. Go into the "code.gs" script.
+
+You should have a Google App Script project now, with 2 scripts in it, code.gs and diff.gs.
+
+III. Configuring the Automation
+
+  1. In the script editor, select the code.gs file.
+  2. From the Resources menu, select "Current Project's Triggers"
+  3. Click the "No triggers setup. Click here to add one" link.
+  4. Under "Run" select the "getDailyWordCount()" function.
+  5. Under Events, select "Time-Driven" -> "Day Timer" -> "11pm - midnight"
+  6. Click Save
+
+This will call the getDailyWordCount() function once every day between 11pm and midnight. You won't have to
+run the script manually. It will work automatically.
+
+IV. Using the scripts
+
+One you've set things up as listed above, all you should have to do it write. When you create a new document
+that you want captured in your daily word count, but sure to put the document in your Sandbox folder. This is
+where the script looks for documents and it is from here that it makes archival copies into the Earlier folder
+so that is can produce a difference file.
+
+CAUTION: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-
+written each night. When you go to edit a file in your Sandbox, BE SURE THAT IS IT IN YOUR SANDBOX FOLDER and NOT
+the EARLIER folder.
+
+I made my Sandbox folder a starred folder and have a shortcut to that folder that I use so that I don't
+accidentally edit the earlier version of the file and lose my changes.
 
