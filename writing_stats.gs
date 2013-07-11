@@ -1,6 +1,8 @@
-// Writing Tracker
-// Code header goes here
-// Include creative commons
+// Google Writing Tracker
+
+
+// Google Writing Tracker by Jamie Todd Rubin is licensed under a Creative Commons Attribution-ShareAlike 
+// 3.0 Unported License.
 
 
 // ------------------------------------------------------------------------------------------------------
