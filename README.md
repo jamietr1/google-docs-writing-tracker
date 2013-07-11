@@ -105,6 +105,16 @@ that you want captured in your daily word count, but sure to put the document in
 where the script looks for documents and it is from here that it makes archival copies into the Earlier folder
 so that is can produce a difference file.
 
+When I have finished a draft, I usually move the document out of my SANDBOX and into some other folder. I purge
+the Earlier version as well. When I start a new draft, I create a new file and drop it in my Sandbox. Wash. Risne.
+Repeat.
+
+The script should run each night between 11pm and midnight. This is Eastern Daylight Time. To change the script to
+your local time zone, search the code.gs for "EDT" and made the proper substitution. I run the script at this time
+because I am generally done for the day and I want the script to capture the day's work. Some people may be night
+owls and want the script to run at other times. That's fine, but depending on when you run it, you might have to
+alter the date of the files the script looks for. Again, this was written with me and my habits in mind.
+
 <strong><font color="red">CAUTION</font></strong>: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-
 written each night. When you go to edit a file in your Sandbox, BE SURE THAT IS IT IN YOUR SANDBOX FOLDER and NOT
 the EARLIER folder.
