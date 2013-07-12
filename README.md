@@ -49,7 +49,7 @@ I. File System Setup
 
       a. Name the first tab in the spreadsheet "Writing"<br />
       b. Give cell A1 the label "Date"<br />
-      c. Give cell B2 the label "Words"<br />
+      c. Give cell B1 the label "Words"<br />
       d. Record the file ID of the spreadsheet. You can do this by copying it from the file URL:
       
          If your URL looks like this:
@@ -65,6 +65,23 @@ I. File System Setup
   4. Create a sub-folder in "Sandbox" called "Earlier" 
 
 II. Script Setup
+
+The following steps take place in Goolge Drive. If you do not see a Script option when you click 
+on "Create" to create a new Google Doc, follows these one-time instructions (if you already have the
+Script app in your menu, you can skip to item B below.
+
+A. One-time Google App Script install:
+
+  1. Click on the Connect More Apps link at the bottom of the Create menu.
+  2. Search for "Script"
+  3. Select "Google App Script" from the search results
+  4. Install the Google App Scripts
+
+You should now have a "Script" option when you click on the Create menu in Google Drive.
+
+Proceed with the following steps to complete the setup.
+
+B. Google Doc Writing Tracker script setup:
 
   1. Create a new Script file called "WritingStats"
   2. When prompted for the type of project, select "Blank Project"
