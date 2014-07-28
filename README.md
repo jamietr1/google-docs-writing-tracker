@@ -138,12 +138,12 @@ If you would like to get an email like this every day, follow the instructions b
 
 Your Writing Data spreadsheet will need to be configured with several new tabs:
 
-### Create the Goals tab.
+### Create the Goal tab.
 
-If you don't already have a Goals tab, you need to create one.
+If you don't already have a Goal tab, you need to create one.
 
 1. Create a new tab in your Writing Data spreadsheet
-2. Name the tab "Goals"
+2. Name the tab "Goal"
 3. The Goals tab should have 2 columns that should look something like this:
 
 | Date      | Goal      |
