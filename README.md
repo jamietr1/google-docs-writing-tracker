@@ -107,7 +107,7 @@ the ID is
 
 By default, the Google Writing Tracker will capture total daily word counts for documents in your sandbox. If you want to track fiction and nonfiction breakdowns, do the following:
 
-1. Set the MODE value to 1
+1. Set the Word Count Mode value to 1
 2. In each document you create, you will need a tag to indication whether it is fiction or nonfiction. The defaults are {{Fiction}} and {{Nonfiction}). I have a template for fiction and nonfiction that automatically include these tags at the bottom of the document.
 3. For existing documents, you can go into your Sandbox and add the appropriate tag to each document.
 
