@@ -50,24 +50,21 @@ All of the data and settings meta-data for the Google Writing Tracker are now st
 
 1. Copy this file to a folder in your Google Drive.
 2. Note the file ID of the spreadsheet in your folder. The ID is the part between key= and #gid in the URL. So if your URL is:
-
   https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE#gid=42
-  
 the ID is
-
   0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE
-
-3. Verify your spreadsheet has 6 tabs as follows:
+3. Open the spreadsheet.
+4. Verify your spreadsheet has 6 tabs as follows:
   * Writing
   * Blogging
   * Goal
   * Records
   * Data
   * Config
-
-4. If you are using an old version of the spreadsheet, copy your data from the Writing, Goals, Record, and Data tabs into the appropriate tabs on the new spreadsheet.
+6. From the File menu, select Spreadsheet Settings...
+7. Set the Time Zone to your local time zone.
+8. If you are using an old version of the spreadsheet, copy your data from the Writing, Goals, Record, and Data tabs into the appropriate tabs on the new spreadsheet.
   * NOTE: When copying data from the old spreadsheet to the Writing tab, your word counts should go in the Total column (Column D). Leave the Fiction/Nonfiction columns blank for now.
-  * 
 
 ## Configure the spreadsheet
 
