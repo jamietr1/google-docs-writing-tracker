@@ -73,7 +73,7 @@ the ID is
 
 1. Go to the Config tab. You will see something that looks like this:
 
-![alt text](https://github.com/jamietr1/google-docs-writing-tracker/beta-version-2/images/GWT_Settings_1.png "Google Writing Tracker Settings")
+![alt text](https://github.com/jamietr1/google-docs-writing-tracker/blob/beta-version-2/images/GWT_Settings_1.png "Google Writing Tracker Settings")
 
 2. Fill in each of the **blank** required fields.
   * Put the values in the yellow (value) cells.
