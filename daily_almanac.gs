@@ -7,6 +7,7 @@ var WRITING_DATA = "[YOUR FILE ID]";  // ID to your writing stats spreadsheet
 var TEST_MODE = loadConfigData("Test Mode");
 var EMAIL_ADDRESS = loadConfigData("Email Address");
 var TIME_ZONE = Session.getTimeZone();
+
 var WRITING_SHEET = loadConfigData("Writing Sheet");
 var DATA_SHEET = loadConfigData("Data Sheet");
 var RECORD_SHEET = loadConfigData("Record Sheet");
@@ -38,10 +39,12 @@ var USE_TUMBLR = loadConfigData("Use Tumblr");
 if (USE_TUMBLR == 1)
   var TUMBLR_EMAIL = loadConfigData("Tumblr Email");
 
+if (TEST_MODE == 1)
+  Logger.log("Detected time zone as: " + TIME_ZONE);
+
 
 
 /* ===================================================================================================================== */
-
 
 function loadConfigData(setting) {
   var ss = SpreadsheetApp.openById(WRITING_DATA)
@@ -82,6 +85,7 @@ function getAlamancText() {
   
   var d = new Date();
   d.setDate(d.getDate()-OFFSET_DAYS);
+
   var almanac_day = Utilities.formatDate(d, TIME_ZONE, "MM/dd/yyyy");
   var message;
   var tumblr_message;
@@ -127,9 +131,13 @@ function getAlamancText() {
   var totalWords = totalFicNonFicWords + blogWords;
   
   // Get writing streak
+  if (TEST_MODE == 1)
+    Logger.log("Calling getStreakDays(" + almanac_day + ", Writing, 0)");
   var ficStreak = getStreakDays(almanac_day, "Writing", 0);
   
   // Get writing goal streak
+  if (TEST_MODE == 1)
+    Logger.log("Calling getStreakDays(" + almanac_day + ", Writing, " + ficGoal + ")");    
   var goalStreak = getStreakDays(almanac_day, "Writing", ficGoal);
   
   // Get best writing streak
@@ -140,6 +148,8 @@ function getAlamancText() {
   
   if (REPORT_BLOGGING == 1) {
     // Get blogging streak
+    if (TEST_MODE == 1)
+      Logger.log("Calling getStreakDays(" + almanac_day + ", Bloggingg, 0)");
     var blogStreak = getStreakDays(almanac_day, "Blogging", 0);
   
     // Get best blogging streak
@@ -358,8 +368,11 @@ function getStreakDays(date, type, goal) {
   
   var range = sheet.getRange("A2:A" + sheet.getLastRow());
   var match = findDate(date, range);
+  if (match == null)
+    var row = sheet.getRange("A" + sheet.getLastRow() + ":A" + sheet.getLastRow()).getRow();
+  else
+    var row = match.getRow();
   
-  var row = match.getRow();
   if (sheet.getRange(cur_column + row).getValue() > 0) {
     /* ASSERT: almanac_day wasn't 0 so work backwards */
     for (r = row; r>1; r--) {
@@ -372,7 +385,9 @@ function getStreakDays(date, type, goal) {
 
     }  
   }
-  return streak;
+
+    return streak;
+
 }
 
 function getWritingGoal() {
@@ -390,6 +405,7 @@ function getWordsWritten(date, type, wordType) {
   
   var range = sheet.getRange("A2:A" + sheet.getLastRow());
   var match = findDate(date, range);
+  Logger.log(match);
   
   if (wordType == "fiction" || wordType == "Blogging") {  
     try {
@@ -407,11 +423,15 @@ function getWordsWritten(date, type, wordType) {
   return words;
 }
 
+
+
 function findDate(value, range) {
   var data = range.getValues();
   for (var i = 0; i < data.length; i++) {
     for (var j = 0; j < data[i].length; j++) {
-      var curDate = Utilities.formatDate(data[i][j], TIME_ZONE, "MM/dd/yyyy");      
+      //var curDate = stringifyDate(data[i][j]);
+      var curDate = Utilities.formatDate(data[i][j], TIME_ZONE, "MM/dd/yyyy");  
+      Logger.log(curDate + " <-> " + data[i][j]);
       if (curDate == value) {
         return range.getCell(i + 1, j + 1);
       }
