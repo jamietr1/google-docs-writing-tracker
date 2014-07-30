@@ -146,11 +146,15 @@ function getDailyWordCount() {
     Logger.log("Checking file: " + files[i].getName() + "...");
     if (today == Utilities.formatDate(files[i].getLastUpdated(), TIME_ZONE, "yyyy-MM-dd")) {
       Logger.log("  -> File was modified today. Getting word count...");
-      writingType = getWritingType(files[i].getId());
-      if (writingType == "Fiction")
-        words_fiction += getFileWordCount(files[i].getId());
-      else
-        words_nonfiction += getFileWordCount(files[i].getId());
+      if (MODE == 1) {
+        writingType = getWritingType(files[i].getId());
+        if (writingType == "Fiction")
+          words_fiction += getFileWordCount(files[i].getId());
+        else
+          words_nonfiction += getFileWordCount(files[i].getId());
+      } else {
+        words_fiction += getFileWordCount(files[i].getId()); 
+      }
                                                          
       // grab difference for Evernote
       local_diff = getFileDiff(files[i].getId());
