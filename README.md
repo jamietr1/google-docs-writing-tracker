@@ -3,7 +3,7 @@ google-docs-writing-tracker
 
 # Overview
 
-The Google Docs writing tracker automates the process of logging how much you write each day. It does 3 main things:
+If you use Google Docs, Google Writing Tracker automates the process of logging how much you write each day. It does 3 main things:
 
   1. Gets a total word count for the day and logs the word count to a Google Spreadsheet.
   2. Generates an HTML file of of what you wrote today, including differences from yesterday.
@@ -14,49 +14,119 @@ The result is a spreadsheet containing the raw numbers, how much you wrote each 
 
 The writing tracker depends on a very specific configuration so please be sure to read the setup instructions below.
 
+# Beta version
+
+This is a beta version, published to the beta-version-2 branch. I have tested this fairly exhaustively in my own environment, but I also wrote the code for my environment, so things may be buggy. If you find a problem, please post an issue with as much details as possible.
+
 # A note on the (lack of) support
 
 Keep in mind that I originally developed this code for me, without thinking others would be using it. If it seems cumbersome to setup, sorry! Also, <strong>USE IT AT YOUR OWN RISK</strong>. It works well for me, but I've been using it for over a year and it was designed around my work-style. People have asked that I make the code available, and I have done that, but I have no time to support it. Feel free to email me at feedback [at] jamietoddrubin dot com with questions, but there is no guarantee that I will be able to reply, or answer the questions. Again, sorry about this.
 
-# Configuration
+# New features in the beta-version-2 branch
 
-The writing tracker depends on you doing all of your writing within a single folder in Google Docs. Call this folder your "Sandbox". Inside your sandbox you should keep all of your working documents. Also inside the Sandbox is a sub-folder called "Earlier" containing earlier versions of your working documents. You must create this sub-folder, but the scripts should keep it up-to-date.
+* Application completely refactored to be much more data-driven, making the setup and execution much easier.
+* New base version of the Writing spreadsheet [available here](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing).
+* Ability to break daily word counts into fiction/nonfiction.
+* Ability to run the scripts in test mode, to see results in log without making changes to the spreadsheet.
+* Ability to customize the order of the columns on the Writing tab.
+* Ability to customize the names of the tabs in the spreadsheet.
+* Ability to customize the location of the Sandbox and Snapshot folders.
+* Placeholders for tracking blogging word counts (not fully implemented in this version).
+* Ability to automatically capture time spent writing for users of RescueTime.
+* Ability to post Daily Almanac updates to Tumblr via email.
+* Improved logging.
+* Validation of configuration settings.
 
-As currently designed, you should use the folder names as given above. In the future, I'll make this more flexible, but when I designed this, it was originally for me and I didn't really think other people would be using it.
+# Getting Started
 
-Finally, the system uses a Google Spreadsheet. You can call this spreadsheet whatever you want. The scripts refer to it by it's file ID as opposed to its name. However, the spreadsheet MUST have a tab named "Writing". This is where the daily word counts will be recorded. My spreadsheet is called "Writing Data" and I keep it in an "Analytics" folder in Google Docs.
+Here is an overview of the process of getting started with the Google Writing tracker:
 
-# Setting up the Writing Tracker
+1. Copy and configure the [Google Writing Tracker Data spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing)
+2. Install the updated source files.
 
-Please follow these instructions carefully. Getting a step wrong will likely cause the scripts to fail.
+## Copy the Google Writing Tracker Data spreadsheet
 
-## I. File System Setup
+All of the data and settings meta-data for the Google Writing Tracker are now stored in the Writing Tracker spreadsheet. You can get a clean version of the spreadsheet [here](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing).
 
-  1. Create a Google Spreadsheet to store your writing data.
+1. Copy this file to a folder in your Google Drive.
+2. Note the file ID of the spreadsheet in your folder. The ID is the part between key= and #gid in the URL. So if your URL is:
 
-      a. Name the first tab in the spreadsheet "Writing"<br />
-      b. Give cell A1 the label "Date"<br />
-      c. Give cell B1 the label "Words"<br />
-      d. Record the file ID of the spreadsheet. You can do this by copying it from the file URL:
-      
-```
-         If your URL looks like this:
-         
-            https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzHUWEkdivZmxmT18584hY#gid=0
-            
-         the file ID is the part between key= and #gid:
-         
-            0AmEvY6JjICyzHUWEkdivZmxmT18584hY
-```         
-  2. Create a folder called "Scripts"
-  3. Create a folder called "Sandbox"
-  4. Create a sub-folder in "Sandbox" called "Earlier" 
+  https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE#gid=42
+  
+the ID is
 
-## II. Script Setup
+  0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE
 
-The following steps take place in Google Drive. If you do not see a Script option when you click  on "Create" to create a new Google Doc, follows these one-time instructions (if you already have the Script app in your menu, you can skip to item B below.
+3. Verify your spreadsheet has 6 tabs as follows:
+  * Writing
+  * Blogging
+  * Goal
+  * Records
+  * Data
+  * Config
 
-A. One-time Google App Script install:
+4. If you are using an old version of the spreadsheet, copy your data from the Writing, Goals, Record, and Data tabs into the appropriate tabs on the new spreadsheet.
+  * NOTE: When copying data from the old spreadsheet to the Writing tab, your word counts should go in the Total column (Column D). Leave the Fiction/Nonfiction columns blank for now.
+  * 
+
+## Configure the spreadsheet
+
+1. Go to the Config tab. You will see something that looks like this:
+
+![alt text](https://github.com/jamietr1/google-docs-writing-tracker/beta-version-2/images/GWT_Settings_1.png "Google Writing Tracker Settings")
+
+2. Fill in each of the **blank** required fields.
+  * Put the values in the yellow (value) cells.
+  * Putting a value into a required field will change the color of the Status field to green.
+  * Fill in the optional fields as desired.
+  * When all of the Required fields are green, you are all set.
+  * Some basic instructions are in the Description column of the spreadsheet
+  * For now, leave the default values alone.
+
+### Some tips for the configuration
+
+* The Sandbox location is the folder in which your Sandbox resides. This is where your working documents will live. If this folder is on your Google Drive root, simply provide the folder name:
+
+  Sandbox
+  
+* If the Sandbox is located in a subfolder off the root, you would assume your path starts at the root, e.g.:
+
+  Writing/Sandbox
+  
+* The Snapshot location is what used to be called the "Earlier" folder. I tend to keep this as a subfolder of my Sandbox, e.g.:
+
+  Sandbox/Earlier
+  Writing/Sandbox/Earlier
+
+* Of course, you can now call either of this folders whatever you want.
+* The email address is where the Daily Writing Summary and Daily Almanac will be sent. If you want these to go into Evernote automatically, use your Evernote email address.
+* Set Test Mode to 1 if you want to run the scripts in test mode. This will still send email, but it will not make updates to the spreadsheet. It will also do some additional logging.
+* Offset Days is the number of days to offset the date for the Daily Alamanc. I schedule the Daily Almanac to run between midnight and 1 am, so I set my Offset Days to 1. This tells the Daily Almanac to use yesterday's data (today - 1). If you have the Daily Almanac run on the same day as you do your writing, set the Offset Days to 0.
+
+### Tracking fiction and nonfiction word counts
+
+By default, the Google Writing Tracker will capture total daily word counts for documents in your sandbox. If you want to track fiction and nonfiction breakdowns, do the following:
+
+1. Set the MODE value to 1
+2. In each document you create, you will need a tag to indication whether it is fiction or nonfiction. The defaults are {{Fiction}} and {{Nonfiction}). I have a template for fiction and nonfiction that automatically include these tags at the bottom of the document.
+3. For existing documents, you can go into your Sandbox and add the appropriate tag to each document.
+
+Once enabled, the script will use these tags to break down word counts into fiction and nonfiction and include the total in the total column. These breakdowns get reported in the Daily Almanac as well.
+
+# Installing and configurating the source files.
+
+There are two sets of instructions here, one for existing users, another for new users:
+
+## Installation for existing users
+
+1. Copy the code out of the Daily Almanac script in this branch.
+2. Paste it into your exising Daily Almanac script, replacing the code that is there.
+3. Copy the code out of the WritingStats script in this branch.
+4. Paste it into your exising WritingStats script, replacing the code that is there.
+
+## Installation for new users
+
+### One-time Google App Script install:
 
   1. Click on the Connect More Apps link at the bottom of the Create menu.
   2. Search for "Script"
@@ -67,54 +137,59 @@ You should now have a "Script" option when you click on the Create menu in Googl
 
 Proceed with the following steps to complete the setup.
 
-B. Google Doc Writing Tracker script setup:
+### Install the scripts:
 
   1. Create a new Script file called "WritingStats"
   2. When prompted for the type of project, select "Blank Project"
   3. Copy the code from "writing_stats.gs" (in GitHub) and paste it into the code.gs file.
   4. Create a new script file (File->New->Script File) and call it diff.gs.
   5. Copy the code from "diff.gs" (in GitHub) and paste it into the diff.gs file.
-  6. Go into the "code.gs" script. There are four values that must be updated:
 
-      var en_add = "<EMAIL ADDRESS>" -- replace with the email address you want the daily writing
-                                        to be sent. (You can use your Evernote email if you want it
-                                        to go to Evernote
+### Configuring the Automation
 
-      var SANDBOX = "Sandbox";       -- this is the name of your sandbox folder. I recommend using
-                                        this name.
-    
-      var PREV_FOLDER = "Sandbox/Earlier"; -- this is the name of your "Earlier" folder. I recommend
-                                              using this name.
-
-      var QS_FILE = "<file Id>";     -- this is the file ID you recorded
-                                        above in step I-1-d
-
-You should have a Google App Script project now, with 2 scripts in it, code.gs and diff.gs.
-
-## III. Configuring the Automation
-
-  1. In the script editor, select the code.gs file.
-  2. From the Resources menu, select "Current Project's Triggers"
-  3. Click the "No triggers setup. Click here to add one" link.
-  4. Under "Run" select the "getDailyWordCount()" function.
-  5. Under Events, select "Time-Driven" -> "Day Timer" -> "11pm - midnight"
-  6. Click Save
+  1. Open the WritingStats.gs in the Script Editor.
+  2. Select the code.gs file.
+  3. From the Resources menu, select "Current Project's Triggers"
+  4. Click the "No triggers setup. Click here to add one" link.
+  5. Under "Run" select the "getDailyWordCount()" function.
+  6. Under Events, select "Time-Driven" -> "Day Timer" -> "11pm - midnight"
+  7. Click Save
 
 This will call the getDailyWordCount() function once every day between 11pm and midnight. You won't have to run the script manually. It will work automatically.
 
-## IV. Using the scripts
+  1. Open the DailyAlmanac.gs in the Script Editor.
+  1. In the script editor, select the code.gs file.
+  2. From the Resources menu, select "Current Project's Triggers"
+  3. Click the "No triggers setup. Click here to add one" link.
+  4. Under "Run" select the "getAlmanacText()" function.
+  5. Under Events, select "Time-Driven" -> "Day Timer" -> "Midnight - 1am"
+  6. Click Save
 
-One you've set things up as listed above, all you should have to do it write. When you create a  new document that you want captured in your daily word count, but sure to put the document in your Sandbox folder. This is where the script looks for documents and it is from here that it makes archival copies into the Earlier folder so that is can produce a difference file.
+## Configuration (all users)
 
-When I have finished a draft, I usually move the document out of my SANDBOX and into some other folder. I purge the Earlier version as well. When I start a new draft, I create a new file and drop it in my Sandbox. Wash. Rinse. Repeat.
+  1. Open the WritingStat.gs file in the Script Editor
+  2. Set the file ID in line 3, using the key from the new Writing Data spreadsheet above.
+  
+  var WRITING_DATA = "[YOUR KEY GOES HERE]";  
 
-The script should run each night between 11pm and midnight. This is Eastern Time. To change the script to your local time zone, search the code.gs for "EST" and made the proper substitution. I run the script at this time because I am generally done for the day and I want the script to capture the day's work. Some people may be night owls and want the script to run at other times. That's fine, but depending on when you run it, you might have to alter the date of the files the script looks for. Again, this was written with me and my habits in mind.
+  3. Click Save.
+  4. Open the DailyAlmanac.gs file in the Script Editor
+  5. Set the file ID in line 5, using the same key you used in Step 2 above.
+  6. Click Save.
 
-<strong>CAUTION</strong>: You never want to edit the version of the file in the Sandbox/Earlier folder. These edits will be over-written each night. When you go to edit a file in your Sandbox, be sure you are editing the Sandbox version and not the Sandbox/Earlier version. Changes to the latter will likely be overwritten by the script.
+# Using the scripts
+
+One you've set things up as listed above, all you should have to do it write. When you create a  new document that you want captured in your daily word count, but sure to put the document in your Sandbox folder. This is where the script looks for documents and it is from here that it makes archival copies into the Snapshot folder so that is can produce a difference file.
+
+When I have finished a draft, I usually move the document out of my SANDBOX and into some other folder. I purge the Spanshot version as well. When I start a new draft, I create a new file and drop it in my Sandbox. Wash. Rinse. Repeat.
+
+The script should run each night between 11pm and midnight. The script uses your browser time zone to determine your timezone. I run the script at this time because I am generally done for the day and I want the script to capture the day's work. Some people may be night owls and want the script to run at other times. That's fine, but depending on when you run it, you might have to alter the date of the files the script looks for. Again, this was written with me and my habits in mind.
+
+<strong>CAUTION</strong>: You never want to edit the version of the file in the Snapshot (formerly called "Earlier") folder. These edits will be over-written each night. When you go to edit a file in your Sandbox, be sure you are editing the Sandbox version and not the Snapshot version. Changes to the latter will likely be overwritten by the script.
 
 I made my Sandbox folder a starred folder and have a shortcut to that folder that I use so that I don't accidentally edit the earlier version of the file and lose my changes.
 
-# Setting up the Daily Almanac
+# About the Daily Almanac
 
 The Daily Almanac is a script that sends out a daily email message to an address that you provide. The message includes information about how much you wrote on the previous day, and also highlights and streaks or records you may have set. Here is what a typical Daily Almanac message looks like for me:
 
@@ -134,96 +209,22 @@ The Daily Almanac is a script that sends out a daily email message to an address
 
 If you would like to get an email like this every day, follow the instructions below to configure the script on Google Docs.
 
-## 1. Setup the spreadsheet
+## Setup your goals
 
-Your Writing Data spreadsheet will need to be configured with several new tabs:
+I use goals as an arbitrary measure of what I aim for each day. Your daily goal will get recorded on the Writing tab of the spreadsheet each day, and will also be reported in the Daily Almanac
 
-### Create the Goal tab.
-
-If you don't already have a Goal tab, you need to create one.
-
-1. Create a new tab in your Writing Data spreadsheet
-2. Name the tab "Goal"
-3. The Goals tab should have 2 columns that should look something like this:
+1. Go to the "Goal" tab.
+2. The Goals tab should have 2 columns that should look something like this:
 
 | Date      | Goal      |
 | ----------| ----------|
-| 2/24/2013 | 500       |
-| 12/1/2013 | 700       |
-| 3/5/2014  | 500       |
+| 7/29/2014 | 500       |
 
-4. Add a goal entry. You only need one. This is how many words you aim for each day.
+3. The default is 500 words/day. Change this to whatever value you want.
 
-Note: as your goal changes over time, don't erase it, just add the new goal, and the date on which you started the new goal below. This will provide a history in the data.
 
-### Create the Records tab.
+**Note**: as your goal changes over time, don't erase it, just add the new goal, and the date on which you started the new goal below. This will provide a history in the data.
 
-If you don't already have a Records tab, you need to create one.
-
-1. Create a new tab in your Writing Data spreadsheet
-2. Name the tab "Records"
-3. The Records tab should have 5 columns that look like this:
-
-| Type    | Date      | Max        | Streak    | Goal Streak |
-| --------| ----------| -----------| ----------| ------------|
-| Blogging| 1/1/2014  | 0          | 0         | 0           |
-| Writing | 1/1/2014  | 0          | 0         | 0           |
-
-The <strong>Streak</strong> column tracks the number of consecutive days you've written. The <strong>Goal Streak</strong> column tracks the number of consecutive days you've exceeded your personal goal.
-
-4. If you already have a streak going, you can fill in the Streak value in the Writing row. For example, if you've written for 10 consecutive days, put a 10 in that cell.
-5. Leave the blogging values blank. The version of the Writing Tracker I've released publicly does not track blogging.
-
-### Create the Data tab
-
-If you don't already have a Data tab, you need to created one.
-
-1. Create a new tab in your Writing Data spreadsheet
-2. Name the tab "Data"
-3. There should be 4 cells in the tab, as follows:
-
-| Day with now writing | 0  |
-| ---------------------| ---|
-| Total days           | 0  |
-
-4. If you are just getting started, both values should be 0.
-
-## 2. Install the Daily Almanac script
-
-1. Create a new Script file called "DailyAlmanac"
-2. When prompted for the type of project, select "Blank Project"
-3. Copy the code from "daily_almanac.gs" (in GitHub) and paste it into the code.gs file.
-4. Save the script.
-
-## 3. Configure the Daily Almanac script
-
-1. Open the DailyAlmanac script in code.gs.
-2. The top section of the script contains the script configuration information that needs to be updated. Each of the following variable values needs to be updated as follows:
-
-* ```QS_WRITING```: the ID of your Writing data spreadsheet. See instructions above for how to identify the ID.
-* ```EVERNOTE_EMAIL```: the email address you want the Daily Almanac script sent to. I called the variable "Evernote_Email" because that is the address I use. By using my Evernote email address, all of my Daily Almanacs are sent to Evernote automatically. But you can actually use any valid email address that you like.
-
-3. Don't touch the spreadsheet constants.
-4. The execution parameters should be set as follows:
-
-* VERSION = 1
-* REPORT_BLOGGING = 0
-* ```TEST_MODE``` = 0
-
-If you change ```TEST_MODE = 1```, the script will run, and send the email message, but it won't make updates to your spreadsheet. This is a good way of previewing the message without actually making any changes. Just don't forget to set the TEST_MODE back to 0 when you are done testing.
-
-## 4. Schedule the script to run nightly.
-
-This script needs to run after the WritingStats script runs. The former runs on the same day you do your writing. The DailyAlmanac is designed to run on the following day, to report on what you did yesterday.
-
-  1. In the script editor, select the code.gs file.
-  2. From the Resources menu, select "Current Project's Triggers"
-  3. Click the "No triggers setup. Click here to add one" link.
-  4. Under "Run" select the "getAlmanacText()" function.
-  5. Under Events, select "Time-Driven" -> "Day Timer" -> "Midnight - 1am"
-  6. Click Save
-
-This will call the getAlmanac() function once every day between midnight and 1 am. You won't have to run the script manually. It will work automatically.
 
 <strong>Released under Creative Commons</strong>
 

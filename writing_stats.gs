@@ -1,60 +1,157 @@
-// Google Writing Tracker
-
-
-// Google Writing Tracker by Jamie Todd Rubin is licensed under a Creative Commons Attribution-ShareAlike 
-// 3.0 Unported License.
-
-
-// ------------------------------------------------------------------------------------------------------
-
-// The following section sets variables that are customizable by user. Be sure to read the documentation
-// as the code is written for a very specific process.
-
-// Your Evernote email address goes below. This is used to email daily writing to your Evernote account.
-var en_add = "<EVERNOTE EMAIL ADDRESS>"
-
-// The name of your archive folder goes here. This is where the previous days work is copies for comparison
-// to today's work. The default is "Sandbox/Earlier"
-var PREV_FOLDER = "Sandbox/Earlier";
-
-// The name of your sandbox folder goes below. This is the folder in which your working files go.
-var SANDBOX = "Sandbox";
-
-// The FILE ID (see documentation) of your Google Spreadsheet containing your writing data goes here
-// I use the file "Analytics/Writing Data"
-var QS_FILE = "<file id>"; 
-
 var daily_diff = "";
+var error_count = 0;
+var WRITING_DATA = "[YOUR FILE ID]";                              
 
-// -----------------------------------------------------------------------------------------------------
-// FUNCTIONS
-// -----------------------------------------------------------------------------------------------------
+var TEST_MODE = loadConfigData("Test Mode");
+var EMAIL_ADDRESS = loadConfigData("Email Address");
+var SANDBOX = loadConfigData("Sandbox Location");
+var SNAPSHOT_FOLDER = loadConfigData("Snapshot Location");
 
-// Function: getDailyWordCount
-// Purpose:  Loops through any files in SANDBOX that have been modified today and gets the total word
-//           count since yesterday. The word count is calculated by totaling the words for new files
-//           and then totaling the words for existing files and subtracting yesterday's word count from
-//           the SANDBOX/EARLIER folder. The word count is recorded in the QS_FILE, a Google Spreadsheet,
-//           on the "Writing" tab of the spreadsheet. A new row is created with the date and the word
-//           count. Finally, the day's writing, including changes from yesterday, are sent to Evernote via
-//           your Evernote email account.
-// Notes:    The function also creates the backup copies of today's files and puts them in the
-//           SANDBOX/Earlier folder.
+/* Use the time zone of the current session, which should correspond to the user's
+   time zone if their browser settings are correct */
+var TIME_ZONE = Session.getTimeZone();
+
+var SHEET_WRITING = loadConfigData("Writing Sheet");
+var SHEET_GOAL = loadConfigData("Goal Sheet");
+
+/* Constants for records tab */
+
+var RECORD_WRITING_STREAK = loadConfigData("Writing Streak");
+var RECORD_BLOGGING_STREAK = loadConfigData("Blogging Streak");
+var RECORD_WRITING_WORDS = loadConfigData("Words Record");
+var RECORD_BLOGGING_WORDS = loadConfigData("Blogging Record");
+var RECORD_WRITING_DATE = loadConfigData("Writing Record Date");
+var RECORD_BLOGGING_DATE = loadConfigData("Blogging Record Date");
+var RECORD_WRITING_GOAL_STREAK = loadConfigData("Writing Goal Streak");
+var RECORD_BLOGGING_GOAL_STREAK = loadConfigData("Blogging Goal Streak");
+
+/* Constants for Writing tab */
+var WRITING_DATE = loadConfigData("Writing Date");
+var WRITING_FICTION = loadConfigData("Writing Fiction");
+var WRITING_NONFICTION = loadConfigData("Writing Nonfiction");
+var WRITING_TOTAL = loadConfigData("Writing Total");
+var WRITING_AVERAGE = loadConfigData("Writing Average");
+var WRITING_GOAL = loadConfigData("Writing Goal");
+var WRITING_TIME = loadConfigData("Writing Time");
+
+/* Execution parameters */
+var FICTION_TAG = loadConfigData("Fiction Tag");
+var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
+var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
+var MODE = loadConfigData("Word Count Mode");
+  
+
+function find(value, range) {
+  var data = range.getValues();
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].length; j++) {
+      if (data[i][j] == value) {        
+        return range.getCell(i + 1, j + 2);
+      }
+    }
+  }
+  return null;  
+}
+
+
+function loadConfigData(setting) {
+  var ss = SpreadsheetApp.openById(WRITING_DATA)
+  var config_sheet = ss.getSheetByName("Config");
+  var last_row = config_sheet.getLastRow();
+  var range = config_sheet.getRange("A2:B" + last_row);
+  var row = find(setting, range);
+  if (row == null)
+    throw new Error ("ERROR: Could not find setting '" + setting + "' in the Config tab.");
+  else {
+    var row_result = row.getRow();
+    var result = config_sheet.getRange("B" + row_result).getValue();
+    if (config_sheet.getRange("C" + row_result).getValue() == "Required" && result == "") {
+      error_count++;
+      Logger.log("ERROR: Required setting '" + setting + "' is not set on the Config tab.");
+    }
+    return result;
+  }                           
+}
+
+function testHarness()
+{
+  getDailyWordCount(7, 29, 2014);
+}
+
+function initializeWritingStats() 
+{
+  initNamedRangeCell("RecordBloggingStreak", "Records", RECORD_BLOGGING_STREAK);
+  initNamedRangeCell("RecordWritingStreak", "Records", RECORD_WRITING_STREAK);
+  initNamedRangeCell("RecordBloggingWords", "Records", RECORD_BLOGGING_WORDS);
+  initNamedRangeCell("RecordWritingWords", "Records", RECORD_WRITING_WORDS);
+  initNamedRangeCell("RecordBloggingDate", "Records", RECORD_BLOGGING_DATE);
+  initNamedRangeCell("RecordWritingDate", "Records", RECORD_WRITING_DATE);  
+  initNamedRangeCell("RecordBloggingGoalStreak", "Records", RECORD_BLOGGING_GOAL_STREAK);
+  initNamedRangeCell("RecordWritingGoalStreak", "Records", RECORD_WRITING_GOAL_STREAK);
+}
+
+                         
+function initNamedRangeCell(strRangeName, strSheetName, strCell)                         
+{
+  var ss = SpreadsheetApp.openById(WRITING_DATA);
+  if (ss.getRangeByName(strRangeName) == null)
+    ss.setNamedRange(strRangeName, ss.getSheetByName(strSheetName).getRange(strCell));
+}
 
 function getDailyWordCount() {
+  if (error_count > 0)
+  {
+    throw new Error ("Not all required configuration settings have been set. See View->Logs for details.");
+  }
+  
+  if (TEST_MODE == 1) {
+    Logger.log("Running in test mode. No actual changes will be made.");
+    Logger.log(EMAIL_ADDRESS);    
+  }
+  
+  
   daily_diff = "";
   var folder = DocsList.getFolder(SANDBOX);
-  var copy_folder = DocsList.getFolder(PREV_FOLDER);
-  var files = folder.getFiles();
-  var today = Utilities.formatDate(new Date(), "EST", "yyyy-MM-dd");
+  var copy_folder = DocsList.getFolder(SNAPSHOT_FOLDER);
+  
+  /* Corrects Issue 2: gets only Document files */
+  var files = folder.getFilesByType(DocsList.FileType.DOCUMENT);
+  
+  if (arguments.length == 3) {
+    /* ASSERT: month, day and year provided. This is almost always called from the testHarness() function */
+    var pMonth = arguments[0];
+    var pDay = arguments[1];
+    var pYear = arguments[2];
+    pMonth--;
+    pDay;
+    var today = Utilities.formatDate(new Date(pYear, pMonth, pDay), TIME_ZONE, "yyyy-MM-dd");
+    Logger.log("Date passed in as parameter: " + today);        
+  } else {
+    /* ASSERT: no date parameter provided so use the current date */
+    var today = Utilities.formatDate(new Date(), TIME_ZONE, "yyyy-MM-dd");
+    Logger.log("Date not passed in. Using current date: " + today);       
+  }
+
+  if (TEST_MODE == 1)
+    Logger.log("Processing date: " + today);
+    
+  var words_fiction = 0;
+  var words_nonfiction = 0;
   var word_count = 0;
   var local_diff = "";
+  var writing_type = "";
+  
   for (i in files) {
+    /* INV: loop through all of the files */
     Logger.log("Checking file: " + files[i].getName() + "...");
-    if (today == Utilities.formatDate(files[i].getLastUpdated(), "EST", "yyyy-MM-dd")) {
+    if (today == Utilities.formatDate(files[i].getLastUpdated(), TIME_ZONE, "yyyy-MM-dd")) {
       Logger.log("  -> File was modified today. Getting word count...");
-      word_count += getFileWordCount(files[i].getId());
-      
+      writingType = getWritingType(files[i].getId());
+      if (writingType == "Fiction")
+        words_fiction += getFileWordCount(files[i].getId());
+      else
+        words_nonfiction += getFileWordCount(files[i].getId());
+                                                         
       // grab difference for Evernote
       local_diff = getFileDiff(files[i].getId());
       if (local_diff != "") {
@@ -62,25 +159,54 @@ function getDailyWordCount() {
       }
       
       // backup the current version of the file
-      backupFile(files[i].getId())
+      if (TEST_MODE == 1)
+        Logger.log("TEST MODE: Original/Old files will be untouched.");
+      else
+        backupFile(files[i].getId())
     }
   }
   
-  //This could eventually be it's own function
-  today = Utilities.formatDate(new Date(), "EST", "MM/dd/yyyy");
+  /* Grab total time spent writing from RescueTime */
+  if (RESCUETIME_TOKEN != "" && RESCUETIME_TOKEN != null)
+    var time_total = getWritingTime(today);
+  else
+    var time_total = "";
   
-  var qs_doc = SpreadsheetApp.openById(QS_FILE);
-  var sheet = qs_doc.getSheetByName("Writing");
+  var qs_doc = SpreadsheetApp.openById(WRITING_DATA);
+  var sheet = qs_doc.getSheetByName(SHEET_WRITING);
   var range = sheet.getLastRow();
   range++;
-  var dateCell = sheet.getRange("a" + range);
-  var wordCell = sheet.getRange("b" + range);
-  dateCell.setValue(today);
-  wordCell.setValue(word_count);
   
+  var dateCell = sheet.getRange(WRITING_DATE + range);
+  var ficWordCell = sheet.getRange(WRITING_FICTION + range);
+  var nfWordCell = sheet.getRange(WRITING_NONFICTION + range);
+  var wordCell = sheet.getRange(WRITING_TOTAL + range);
+  var avgCell = sheet.getRange(WRITING_AVERAGE + range);
+  var goalCell = sheet.getRange(WRITING_GOAL + range);
+  var timeCell = sheet.getRange(WRITING_TIME + range)
   
+  var words = words_fiction + words_nonfiction;
+  
+  if (TEST_MODE == 1) {
+    Logger.log("TEST MODE: Would set " + WRITING_DATE + range + " to " + today);
+    if (MODE == 1) {
+      Logger.log("TEST MODE: Would set " + WRITING_FICTION + range + " to " + words_fiction);
+      Logger.log("TEST MODE: Would set " + WRITING_NONFICTION + range + " to " + words_nonfiction);
+    }
+    Logger.log("TEST MODE: Would set " + WRITING_TOTAL + range + " to " + words);
+    Logger.log("TEST MODE: Would set " + WRITING_TIME + range + " to " + time_total);
+  } else {
+    dateCell.setValue(today);
+    if (MODE == 1) {
+      ficWordCell.setValue(words_fiction);
+      nfWordCell.setValue(words_nonfiction);
+    }
+    wordCell.setValue(words);    
+    timeCell.setValue(time_total);
+  }
+    
   if (daily_diff != "") {
-    // Send email to Evernote only if there has been changes or new writing
+    // Send email only if there has been changes or new writing
     var message = "<html><body>";
     var lines = daily_diff.match(/^.*((\r\n|\n|\r)|$)/gm);
     var cur_line = "";
@@ -91,26 +217,59 @@ function getDailyWordCount() {
     }
     message = message + "</body></html>";
     
-    // Send the changes to Evernote <-- Only send if there was writing!
-    Logger.log("  -> Sending email to Evernote");
-    var subject = "Daily writing for " + today + " @Writing";
-    MailApp.sendEmail(en_add, subject, "", {htmlBody: message});      
+    // Send the changes <-- Only send if there was writing!
+    Logger.log("  -> Sending email");
+    if (TEST_MODE == 1)
+      var subject = "(TEST) Daily writing for " + today + " @timeline #writing";
+    else
+      var subject = "Daily writing for " + today + " @timeline #writing";      
+    MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});      
   } else {
     Logger.log("  -> Nothing new so no email send.");
   }
 }
 
 
-// Function: backupFile
-// Purpose:  For a given file id, this function copies the file from the SANDBOX to the 
-//           SANDBOX/Earlier folder. It sends old version of the file in SANDBOX/Earlier
-//           to the trash.
+function getWritingTime(rt_date) {
+  var api_format = "json";
+  var perspective = "interval";
+  var resolution = "hour";
+  var kind = "activity";
+  var thing = "docs.google.com";
+  var thingy = "Google Docs";
+  
+  var URL = "https://www.rescuetime.com/anapi/data?";
+  URL += "key=" + RESCUETIME_TOKEN;
+  URL += "&format=" + api_format;
+  URL += "&perspective=" + perspective;
+  URL += "&rs=" + resolution;
+  URL += "&rb=" + rt_date;
+  URL += "&rk=" + kind;
+  URL += "&rt=" + thing;
+  
+  var response = UrlFetchApp.fetch(URL).getContentText();
+  var dataAll = JSON.parse(response);
+  
+  if (TEST_MODE == 1) {
+    Logger.log(URL);
+    Logger.log(dataAll.rows);
+  }
+  
+  var totalSeconds = 0;
+  result_rows = dataAll.rows;
+  for (i=0; i< result_rows.length; i++) {
+    var gDoc = result_rows[i][3];
+    if (gDoc.indexOf("Google Docs")>0)
+      totalSeconds += result_rows[i][1];
+  }
+  return totalSeconds/60;
+}
 
 function backupFile(id) {
-  var folder = DocsList.getFolder(PREV_FOLDER);
+  var folder = DocsList.getFolder(SNAPSHOT_FOLDER);
   var orig = DocsList.getFileById(id);
   Logger.log("  -> Backing up " + orig.getName() + " to " + folder.getName() + "...");
-  if (doesFileExistByName(PREV_FOLDER, orig.getName())){
+  if (doesFileExistByName(SNAPSHOT_FOLDER, orig.getName())){
     var files = folder.getFiles();
     for (f in files) {
       if (files[f].getName() == orig.getName()) {
@@ -126,11 +285,6 @@ function backupFile(id) {
 
 }
 
-
-// Function: doesFileExistByName
-// Purpose:  Given a folder and a name, returns true if the file exists, or false if the 
-//           file does not exist.
-
 function doesFileExistByName(folder, name) {
   var found = false;
   var list = DocsList.getFolder(folder);
@@ -144,11 +298,6 @@ function doesFileExistByName(folder, name) {
   return found;
 }
 
-// Function: getFileDiff
-// Purpose:  Given a file id, returns an html text string of the differences between file id in
-//           SANDBOX and the previous day's version in SANDBOX/Earlier. The output is color-coded
-//           so you can easily see what was added, removed and changed.
-
 function getFileDiff(id) {
   var doc = DocumentApp.openById(id);
   var name = doc.getName();
@@ -158,8 +307,8 @@ function getFileDiff(id) {
   
   // Is there a file from which to compare?
   Logger.log("  -> Checking file diff for " + name + "...");
-  var folder = DocsList.getFolder(PREV_FOLDER);
-  if (doesFileExistByName(PREV_FOLDER, name)) {
+  var folder = DocsList.getFolder(SNAPSHOT_FOLDER);
+  if (doesFileExistByName(SNAPSHOT_FOLDER, name)) {
     Logger.log("  -> An earlier version of the file exists...");
     var files = folder.getFiles();
     for (f in files) {
@@ -184,11 +333,44 @@ function getFileDiff(id) {
   
 }
 
+function getWritingType(id) {
+  var doc = DocumentApp.openById(id);
+  var doc_text = doc.getText();
+  var search_for = FICTION_TAG;
+  var index = -1;
+  var result = "";
+  
+  while(true) {
+    index = doc_text.indexOf(search_for, index+1);
+    if (index == -1)
+      break;
+    else {
+      var result = "Fiction";
+      break;
+    }
+  }
+  
+  if (result =="") {
+    var search_for = NONFICTION_TAG;
+    var index = -1
+    while(true) {
+      index = doc_text.indexOf(search_for, index+1)
+      if (index == -1)
+        break;
+      else {
+        var result = "Nonfiction";
+        break;
+      }
+    }
+  }
+  
+  // For now assume that nothing (old docs) means fiction
+  if (result == "")
+    result = "Fiction";
+      
+  return result;
+}
 
-// Function: getFileWordCount
-// Purpose:  Given a file id, returns the word count for that file in SANDBOX, adjusting the
-//           count for the day's work only, by subtracting the count from the previous day, if
-//           the file existed on the previous day.
 
 function getFileWordCount(id) {
   var doc = DocumentApp.openById(id);
@@ -198,8 +380,8 @@ function getFileWordCount(id) {
   var diff = "";
   
   // Does an earlier version exist?
-  var folder = DocsList.getFolder("Sandbox/Earlier");
-  if (doesFileExistByName("Sandbox/Earlier", name)) {
+  var folder = DocsList.getFolder(SANDBOX);
+  if (doesFileExistByName(SNAPSHOT_FOLDER, name)) {
     var files = folder.getFiles();
     for (f in files) {
       if (files[f].getName() == name)
@@ -217,10 +399,6 @@ function getFileWordCount(id) {
   return count;
 }
 
-
-// Function: getWordCount
-// Purpose:  Given a text string, returns the number of words in that text string.
-
 function getWordCount(text) {
   text = text.replace(/(^\s*)|(\s*$)/gi,"");
   text = text.replace(/[ ]{2,}/gi," ");
@@ -231,4 +409,12 @@ function getWordCount(text) {
 function chomp(raw_text)
 {
   return raw_text.replace(/(\n|\r)+$/, '');
+}
+
+function getWritingGoal() {
+  var qs_doc = SpreadsheetApp.openById(WRITING_DATA);
+  var sheet = qs_doc.getSheetByName(SHEET_GOAL);
+  var lastRow = sheet.getLastRow();
+  var goal = sheet.getRange("B" + lastRow).getValue();
+  return goal;
 }
