@@ -75,7 +75,7 @@ function loadConfigData(setting) {
 
 function testHarness()
 {
-  getDailyWordCount(7, 30, 2014);
+  getDailyWordCount(7, 31, 2014);
 }
 
 function initializeWritingStats() 
@@ -140,6 +140,8 @@ function getDailyWordCount() {
   var word_count = 0;
   var local_diff = "";
   var writing_type = "";
+  var moving_average = "";
+  var daily_goal = getWritingGoal();
   
   for (i in files) {
     /* INV: loop through all of the files */
@@ -190,7 +192,10 @@ function getDailyWordCount() {
   var wordCell = sheet.getRange(WRITING_TOTAL + range);
   var avgCell = sheet.getRange(WRITING_AVERAGE + range);
   var goalCell = sheet.getRange(WRITING_GOAL + range);
-  var timeCell = sheet.getRange(WRITING_TIME + range)
+  var timeCell = sheet.getRange(WRITING_TIME + range);
+  var avgCell = sheet.getRange(WRITING_AVERAGE + range);
+  var avgStart = range - 6;
+  
   
   var words = words_fiction + words_nonfiction;
   
@@ -200,8 +205,10 @@ function getDailyWordCount() {
       Logger.log("TEST MODE: Would set " + WRITING_FICTION + range + " to " + words_fiction);
       Logger.log("TEST MODE: Would set " + WRITING_NONFICTION + range + " to " + words_nonfiction);
     }
-    Logger.log("TEST MODE: Would set " + WRITING_TOTAL + range + " to " + words);
+    Logger.log("TEST MODE: Would set " + WRITING_TOTAL + range + " to " + words);    
     Logger.log("TEST MODE: Would set " + WRITING_TIME + range + " to " + time_total);
+    Logger.log("TEST MODE: Would set " + WRITING_AVERAGE + range + " to =AVERAGE(" + WRITING_TOTAL + avgStart + ":" + WRITING_TOTAL + range + ")");
+    Logger.log("TEST MODE: Would set " + WRITING_GOAL + range + " to " + daily_goal);
   } else {
     dateCell.setValue(today);
     if (MODE == 1) {
@@ -210,6 +217,8 @@ function getDailyWordCount() {
     }
     wordCell.setValue(words);    
     timeCell.setValue(time_total);
+    goalCell.setValue(daily_goal);
+    avgCell.setFormula("=AVERAGE(" + WRITING_TOTAL + avgStart + ":" + WRITING_TOTAL + range + ")");
   }
     
   if (daily_diff != "") {
