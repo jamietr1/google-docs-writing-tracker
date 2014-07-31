@@ -68,7 +68,7 @@ All of the data and settings meta-data for the Google Writing Tracker are now st
 
 1. Go to the Config tab. You will see something that looks like this:  
 
-   ![alt text](https://github.com/jamietr1/google-docs-writing-tracker/beta-version-2/images/GWT_Settings_1.png "Google Writing Tracker Settings")  
+   ![alt text](https://github.com/jamietr1/google-docs-writing-tracker/blob/beta-version-2/images/GWT_Settings_1.png "Google Writing Tracker Settings")  
 
 2. Fill in each of the **blank** required fields.
   * Put your values in the yellow (value) cells.
