@@ -46,6 +46,13 @@ if (TEST_MODE == 1)
 
 /* ===================================================================================================================== */
 
+function tester() {
+  var data = "Wed Jul 30 2014 00:00:00 GMT-0400 (EDT)";
+  var curDate = Utilities.formatDate(data, TIME_ZONE, "MM/dd/yyyy");
+  Logger.log(curDate);
+}
+
+
 function loadConfigData(setting) {
   var ss = SpreadsheetApp.openById(WRITING_DATA)
   var config_sheet = ss.getSheetByName("Config");
@@ -105,7 +112,7 @@ function getAlamancText() {
     var nonFictionPercent = 100 - fictionPercent;
   } else {
     /* ASSERT: Don't split, just give the totals */
-    var ficWords = getWordsWritten(almanac_day, "Writing", "fiction");
+    var ficWords = getWordsWritten(almanac_day, "Writing", "total");
     var totalFicNonFicWords = ficWords;
   }  
   
@@ -409,29 +416,42 @@ function getWordsWritten(date, type, wordType) {
   var match = findDate(date, range);
   Logger.log(match);
   
-  if (wordType == "fiction" || wordType == "Blogging") {  
+  if (wordType == "fiction") {
+    /* ASSERT: capture fiction writing */
     try {
       words = sheet.getRange(COL_FICTION + match.getRow()).getValue();
     } catch (e) {
-      words = 0; 
+      words = 0;
     }
-  } else {
+  } else if (wordType == "nonfiction") {
+    /* ASSERT: capture nonfiction writing */
     try {
       words = sheet.getRange(COL_NONFICTION + match.getRow()).getValue();
     } catch (e) {
       words = 0;
     }
+  } else if (wordType == "Blogging") {
+    /* ASSERT: capture blog writing */
+    try {
+      words = sheet.getRange(COL_BLOGGING_TOTAL + match.getRow()).getValue();
+    } catch (e) {
+      words = 0; 
+    }    
+  } else if (wordType == "total") {
+    /* ASSERT: capture total writing when Word Count Mode = 0 */
+    try {
+      words = sheet.getRange(COL_WRITING_TOTAL + match.getRow()).getValue();
+    } catch (e) {
+      words = 0; 
+    }        
   }
   return words;
 }
-
-
 
 function findDate(value, range) {
   var data = range.getValues();
   for (var i = 0; i < data.length; i++) {
     for (var j = 0; j < data[i].length; j++) {
-      //var curDate = stringifyDate(data[i][j]);
       var curDate = Utilities.formatDate(data[i][j], TIME_ZONE, "MM/dd/yyyy");  
       Logger.log(curDate + " <-> " + data[i][j]);
       if (curDate == value) {
