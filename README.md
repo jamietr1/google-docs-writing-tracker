@@ -110,7 +110,7 @@ By default, the Google Writing Tracker will capture total daily word counts for 
 
 Once enabled, the script will use these tags to break down word counts into fiction and nonfiction and include the total in the total column. These breakdowns get reported in the Daily Almanac as well.
 
-# Installing and configurating the source files.
+# Installing and configuring the source files.
 
 There are two sets of instructions here, one for existing users, another for new users:
 
@@ -141,6 +141,9 @@ Proceed with the following steps to complete the setup.
   3. Copy the code from "writing_stats.gs" (in GitHub) and paste it into the code.gs file.
   4. Create a new script file (File->New->Script File) and call it diff.gs.
   5. Copy the code from "diff.gs" (in GitHub) and paste it into the diff.gs file.
+  6. From the File menu select Project Properties...
+  7. Set the project time zone to your local time zone.
+  8. Save the files.
 
 ### Configuring the Automation
 

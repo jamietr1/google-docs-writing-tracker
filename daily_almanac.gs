@@ -91,68 +91,70 @@ function getAlamancText() {
   var tumblr_message;
   
   updateRanges();
-  Logger.log("Just arrived in getAlamancText()");
   
-  // Get writing goal
+  /* Get writing goals */
   var ficGoal = getWritingGoal();
-  Logger.log("Set writing goal.");
   
-  // Get fiction/nonfiction word count
-  
+  /* Get word counts */  
   if (MODE == 1) {
+    /* ASSERT: Split into fiction/nonficiton */
     var ficWords = getWordsWritten(almanac_day, "Writing", "fiction");
     var nfWords = getWordsWritten(almanac_day, "Writing", "nonfiction");
     var totalFicNonFicWords = ficWords + nfWords;
     var fictionPercent = (ficWords/totalFicNonFicWords)*100;
     var nonFictionPercent = 100 - fictionPercent;
   } else {
+    /* ASSERT: Don't split, just give the totals */
     var ficWords = getWordsWritten(almanac_day, "Writing", "fiction");
     var totalFicNonFicWords = ficWords;
   }  
   
-  // Get best word count
+  /* Get writing record and date */
   var ficBest = getMaxRecord("Writing");
   var ficBestDate = getMaxRecordDate("Writing");
   
   if (REPORT_BLOGGING == 1) {
-    // Get blogging word count
+    /* ASSERT: get blogging word count */
     var blogWords = getWordsWritten(almanac_day, "Blogging", "Blogging");
   
-    // Get best blogging word count
+    /* Get blogging record and date */
     var blogBest = getMaxRecord("Blogging");
     var blogBestDate = getMaxRecordDate("Blogging");
+  } else {
+    /* ASSERT: not counting blogging */
+    var blogWords = 0;
   }
   
-  // Get total writing days
+  /* Get total writing days */
   var totalWritingDays = getTotalWritingDays();
   var writingDays = totalWritingDays - getMissedDays();
   
-  
+  /* Total words written */
   var totalWords = totalFicNonFicWords + blogWords;
   
-  // Get writing streak
+  /* Get current writing streak */
   if (TEST_MODE == 1)
     Logger.log("Calling getStreakDays(" + almanac_day + ", Writing, 0)");
   var ficStreak = getStreakDays(almanac_day, "Writing", 0);
   
-  // Get writing goal streak
+  /* Get current writing goal streak */
   if (TEST_MODE == 1)
     Logger.log("Calling getStreakDays(" + almanac_day + ", Writing, " + ficGoal + ")");    
   var goalStreak = getStreakDays(almanac_day, "Writing", ficGoal);
   
-  // Get best writing streak
+  /* Get best writing streak */
   var ficBestStreak = getMaxRecordStreak("Writing", 0);
   
-  // Get best writing goal streak
+  /* Get beste writing goal streak */
   var goalBestStreak = getMaxRecordStreak("Writing", 1);
   
   if (REPORT_BLOGGING == 1) {
-    // Get blogging streak
+    /* ASSERT: Get blogging streak */
     if (TEST_MODE == 1)
       Logger.log("Calling getStreakDays(" + almanac_day + ", Bloggingg, 0)");
     var blogStreak = getStreakDays(almanac_day, "Blogging", 0);
   
-    // Get best blogging streak
+    /* Get best blogging streak */
     var blogBestStreak = getMaxRecordStreak("Blogging", 0);
   }
   
