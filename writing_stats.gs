@@ -75,7 +75,7 @@ function loadConfigData(setting) {
 
 function testHarness()
 {
-  getDailyWordCount(7, 29, 2014);
+  getDailyWordCount(7, 30, 2014);
 }
 
 function initializeWritingStats() 
@@ -148,10 +148,13 @@ function getDailyWordCount() {
       Logger.log("  -> File was modified today. Getting word count...");
       if (MODE == 1) {
         writingType = getWritingType(files[i].getId());
-        if (writingType == "Fiction")
+        if (writingType == "Fiction") {
           words_fiction += getFileWordCount(files[i].getId());
-        else
+          Logger.log("Counted: " + words_fiction + " fiction words");
+        } else {
           words_nonfiction += getFileWordCount(files[i].getId());
+          Logger.log("Counted: " + words_nonfiction + " nonfiction words.");
+        }
       } else {
         words_fiction += getFileWordCount(files[i].getId()); 
       }
@@ -381,10 +384,12 @@ function getFileWordCount(id) {
   var name = doc.getName();
   var doc1 = doc.getText();
   var count = getWordCount(doc1);
+  if (TEST_MODE == 1)
+    Logger.log("Word count for " + name + " is " + count);
   var diff = "";
   
   // Does an earlier version exist?
-  var folder = DocsList.getFolder(SANDBOX);
+  var folder = DocsList.getFolder(SNAPSHOT_FOLDER);
   if (doesFileExistByName(SNAPSHOT_FOLDER, name)) {
     var files = folder.getFiles();
     for (f in files) {
@@ -393,6 +398,8 @@ function getFileWordCount(id) {
         var prev_doc = DocumentApp.openById(files[f].getId());
         var doc2 = prev_doc.getText();
         var prev_count = getWordCount(doc2);
+        if (TEST_MODE == 1)
+          Logger.log("Word count for snapshot of " + name + " is " + prev_count);
         count -= prev_count;
       }
     }
