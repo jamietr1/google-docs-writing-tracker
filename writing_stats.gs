@@ -4,6 +4,7 @@ var WRITING_DATA = "[YOUR FILE ID]";
 
 var TEST_MODE = loadConfigData("Test Mode");
 var EMAIL_ADDRESS = loadConfigData("Email Address");
+var EMAIL_SUBJECT = loadConfigData("Email Subject");
 var SANDBOX = loadConfigData("Sandbox Location");
 var SNAPSHOT_FOLDER = loadConfigData("Snapshot Location");
 
@@ -236,9 +237,9 @@ function getDailyWordCount() {
     // Send the changes <-- Only send if there was writing!
     Logger.log("  -> Sending email");
     if (TEST_MODE == 1)
-      var subject = "(TEST) Daily writing for " + today + " @timeline #writing";
+      var subject = "(TEST) Daily writing for " + today + " " + EMAIL_SUBJECT;
     else
-      var subject = "Daily writing for " + today + " @timeline #writing";      
+      var subject = "Daily writing for " + today + " " + EMAIL_SUBJECT;      
     MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});      
   } else {
     Logger.log("  -> Nothing new so no email send.");

@@ -178,7 +178,7 @@ The following steps install the Daily Almanac
 7. From the File menu, select Project Properties...
 8. In the Project Properties dialog, be sure that Time zone setting is set to your local time zone.
 9. Click OK.
-10 Open a new browser tab to the [daily_almanac.gs](https://raw.githubusercontent.com/jamietr1/google-docs-writing-tracker/beta-version-2/daily_almanac.gs) file on GitHub.
+10. Open a new browser tab to the [daily_almanac.gs](https://raw.githubusercontent.com/jamietr1/google-docs-writing-tracker/beta-version-2/daily_almanac.gs) file on GitHub.
 11. Select all of the code and copy it to the clipboard.
 12. Go back to the DailyAlmanac project
 13. In the Code.gs window, highlight any text that appears there, and the paste in the code you just copied.
