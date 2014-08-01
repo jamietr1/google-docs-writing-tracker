@@ -28,6 +28,9 @@ var COL_BLOGGING_TOTAL = loadConfigData("Blogging Total");
 var COL_FICTION = loadConfigData("Writing Fiction");
 var COL_NONFICTION = loadConfigData("Writing Nonfiction");
 
+/* Email customization */
+var EMAIL_SUBJECT = loadConfigData("Almanac Subject");
+
 
 /* Execution Parameters */
 var MODE = loadConfigData("Word Count Mode");
@@ -45,13 +48,6 @@ if (TEST_MODE == 1)
 
 
 /* ===================================================================================================================== */
-
-function tester() {
-  var data = "Wed Jul 30 2014 00:00:00 GMT-0400 (EDT)";
-  var curDate = Utilities.formatDate(data, TIME_ZONE, "MM/dd/yyyy");
-  Logger.log(curDate);
-}
-
 
 function loadConfigData(setting) {
   var ss = SpreadsheetApp.openById(WRITING_DATA)
@@ -287,11 +283,23 @@ function getAlamancText() {
     message = message + "</ul>";
   }
   
+  /* Process keyword substition for the email subject line */
+  subject = EMAIL_SUBJECT;
+  subject = replaceAll(subject, "{{AlmanacDate}}", almanac_day);
+  subject = replaceAll(subject, "{{TotalWords}}", totalWords);
+  subject = replaceAll(subject, "{{RecordWords}}", ficBest);
+  subject = replaceAll(subject, "{{RecordDate}}", ficBestDate);
+  subject = replaceAll(subject, "{{BlogWords}}", blogWords);
+  subject = replaceAll(subject, "{{TotalDays}}", totalWritingDays);
+  subject = replaceAll(subject, "{{WritingDays}}", writingDays);
+  subject = replaceAll(subject, "{{ConsecutiveDays}}", ficStreak);
+  subject = replaceAll(subject, "{{GoalStreak}}", goalStreak);
+  subject = replaceAll(subject, "{{GoalWords}}", ficGoal);
+  
+  
   // Send the message
-  if (TEST_MODE == 1)
-    var subject = "(TEST) Daily Almanac for " + almanac_day + " @timeline";
-  else 
-    var subject = "Daily Almanac for " + almanac_day + " @timeline";
+  if (TEST_MODE == 1) 
+    Logger.log("Subject: " + subject);    
   
   var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
   MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
@@ -301,6 +309,14 @@ function getAlamancText() {
   
   if (TEST_MODE == 1)  
     Logger.log(message);
+}
+
+function escapeRegExp(string) {
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(string, find, replace) {
+  return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 }
 
 function recalculateGoal(date) {
@@ -453,7 +469,6 @@ function findDate(value, range) {
   for (var i = 0; i < data.length; i++) {
     for (var j = 0; j < data[i].length; j++) {
       var curDate = Utilities.formatDate(data[i][j], TIME_ZONE, "MM/dd/yyyy");  
-      Logger.log(curDate + " <-> " + data[i][j]);
       if (curDate == value) {
         return range.getCell(i + 1, j + 1);
       }

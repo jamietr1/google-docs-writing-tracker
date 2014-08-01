@@ -263,6 +263,52 @@ If you use [RescueTime](http://www.rescuetime.com) to track your application usa
 
 If the token is there, the script will grab a list of all of the time you spent on docs.google.com for that day, and filter it to just session involving Google Docs. It will total the time spent and add that to the Time column on your spreadsheet. **This is experimental** but so far, it's working pretty well for me, and the time is accurate based on my own control tracking.
 
+## Email keyword substitution
+
+Currently, you can customize the subject lines of the email message that goes our for the Daily Almanac and the Writing Summary. To customize these, place your desired subject line text in "Almanac Subject" or "Daily Writing Subject" value fields on the Config tab. If your version of the spreadsheet does not have these fields, you will need too add them in.
+
+Each field can perform some simple keyword substitution.
+
+### Daily Almanac Email Keywords
+
+| Field            | Substitution String | Description                                               |
+| -----------------| ------------------- | --------------------------------------------------------- |
+| Almanac Date     | {{AlmanacDate}}     | The date for which the Almanac is reporting               |
+| Total words      | {{TotalWords}}      | The total number of words written                         |
+| Record Words     | {{RecordWords}}     | The most words ever written on a single day               |
+| Record Date      | {{RecordDate}}      | The date on which the above record was set                |
+| Total Days       | {{TotalDays}}       | The total number of days captured in the spreadsheet      |
+| Writing Days     | {{WritingDays}}     | The total number of days you've written                   |
+| Consecutive Days | {{ConsecutiveDays}} | The total number of consecutive days you've written       |
+| Goal Streak      | {{GoalStreak}}      | The total number of consecutive days you've hit your goal |
+| Goal Words       | {{GoalWords}}       | The current daily word goal                               |
+
+Below are some examples of how you can set the subject line in the Config tab:
+
+1. ```Daily Almanac for {{Almanac Date}}```  
+2. ```Daily Almanac for {{Almanac Date}} ({{ConsecutiveDays}} days)```
+3. ```{{AlmanacDate}} Writing Summary: {{TotalWords}} words```
+4. ```{{AlmanacDate}} Writing Stats: {{TotalWords}} / {{GoalWords}}```
+
+These correspond to the following output:
+
+1. Daily Almanac for 08/01/2014
+2. Daily Almanac for 08/01/2014 (374 days)
+3. 08/01/2014 Writing Summary: 915 words
+4. 08/01/2014 Writing Stats: 915 / 500 words
+
+So you now have flexibility to completely customize the subject line. And yes, eventually I'm looking into making the email message a template that can also be customized.
+
+### Daily Almanac Email Keywords
+
+| Field            | Substitution String | Description                                               |
+| -----------------| ------------------- | --------------------------------------------------------- |
+| Writing Date     | {{WritingDate}}     | The date for which the summary is reporting               |
+| Fiction Words    | {{FictionWords}}    | The total number of fiction words written                 |
+| Nonfiction Words | {{NonfictionWords}} | The total number of nonfiction words written              |
+| Total Words      | {{WritingDays}}     | The total number of words you've written                  |
+| Goal Words       | {{GoalWords}}       | The current daily word goal                               |
+
 <strong>Released under Creative Commons</strong>
 
 <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Google Writing Tracker</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://www.jamietoddrubin.com" property="cc:attributionName" rel="cc:attributionURL">Jamie Todd Rubin</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/deed.en_US">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.

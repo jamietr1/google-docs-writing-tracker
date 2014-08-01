@@ -39,6 +39,10 @@ var FICTION_TAG = loadConfigData("Fiction Tag");
 var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
 var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
 var MODE = loadConfigData("Word Count Mode");
+
+/* Email customization */
+var EMAIL_SUBJECT = loadConfigData("Daily Writing Subject");
+
   
 
 function find(value, range) {
@@ -75,7 +79,7 @@ function loadConfigData(setting) {
 
 function testHarness()
 {
-  getDailyWordCount(7, 31, 2014);
+  getDailyWordCount(8, 1, 2014);
 }
 
 function initializeWritingStats() 
@@ -233,16 +237,30 @@ function getDailyWordCount() {
     }
     message = message + "</body></html>";
     
+    /* Process keyword substitution for the email subject line */
+    subject = EMAIL_SUBJECT;
+    subject = replaceAll(subject, "{{FictionWords}}", words_fiction);
+    subject = replaceAll(subject, "{{NonfictionWords}}", words_nonfiction);
+    subject = replaceAll(subject, "{{WritingDate}}", today);
+    subject = replaceAll(subject, "{{TotalWords}}", words);
+    subject = replaceAll(subject, "{{GoalWords}}", daily_goal);
+    
     // Send the changes <-- Only send if there was writing!
     Logger.log("  -> Sending email");
     if (TEST_MODE == 1)
-      var subject = "(TEST) Daily writing for " + today + " @timeline #writing";
-    else
-      var subject = "Daily writing for " + today + " @timeline #writing";      
+      Logger.log(subject);
     MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});      
   } else {
     Logger.log("  -> Nothing new so no email send.");
   }
+}
+
+function escapeRegExp(string) {
+    return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(string, find, replace) {
+  return string.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 }
 
 
