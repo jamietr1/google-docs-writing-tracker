@@ -6,6 +6,7 @@ var WRITING_DATA = "[YOUR FILE ID]";  // ID to your writing stats spreadsheet
 
 var TEST_MODE = loadConfigData("Test Mode");
 var EMAIL_ADDRESS = loadConfigData("Email Address");
+var EMAIL_SUBJECT = loadConfigData("Email Subject");
 var TIME_ZONE = Session.getTimeZone();
 
 var WRITING_SHEET = loadConfigData("Writing Sheet");
@@ -289,9 +290,9 @@ function getAlamancText() {
   
   // Send the message
   if (TEST_MODE == 1)
-    var subject = "(TEST) Daily Almanac for " + almanac_day + " @timeline";
+    var subject = "(TEST) Daily Almanac for " + almanac_day + " " + EMAIL_SUBJECT;
   else 
-    var subject = "Daily Almanac for " + almanac_day + " @timeline";
+    var subject = "Daily Almanac for " + almanac_day + " " + EMAIL_SUBJECT;
   
   var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
   MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
