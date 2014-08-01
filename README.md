@@ -234,7 +234,7 @@ Once the words have been tallied, they are written to a new row on the Writing t
 
 Later, the Daily Almanac script runs. It collects data about the day's writing, and also looks for any records or trends in the data. Then it generates  and sends a summary email message about your progress for the day.
 
-When I have finished a draft, I usually move the document out of my SANDBOX and into some other folder. I purge the Spanshot version as well. When I start a new draft, I create a new file and drop it in my Sandbox. Wash. Rinse. Repeat.
+When I have finished a draft, I usually move the document out of my SANDBOX and into some other folder. I purge the Snapshot version as well. When I start a new draft, I create a new file and drop it in my Sandbox. Wash. Rinse. Repeat.
 
 The script should run each night between 11pm and midnight. The script uses your browser time zone to determine your time zone. I run the script at this time because I am generally done for the day and I want the script to capture the day's work. Some people may be night owls and want the script to run at other times. That's fine, but depending on when you run it, you might have to alter the date of the files the script looks for. Again, this was written with me and my habits in mind.
 
