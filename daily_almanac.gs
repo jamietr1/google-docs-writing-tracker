@@ -283,33 +283,42 @@ function getAlamancText() {
     message = message + "</ul>";
   }
   
-  /* Process keyword substition for the email subject line */
-  subject = EMAIL_SUBJECT;
-  subject = replaceAll(subject, "{{AlmanacDate}}", almanac_day);
-  subject = replaceAll(subject, "{{TotalWords}}", totalWords);
-  subject = replaceAll(subject, "{{RecordWords}}", ficBest);
-  subject = replaceAll(subject, "{{RecordDate}}", ficBestDate);
-  subject = replaceAll(subject, "{{BlogWords}}", blogWords);
-  subject = replaceAll(subject, "{{TotalDays}}", totalWritingDays);
-  subject = replaceAll(subject, "{{WritingDays}}", writingDays);
-  subject = replaceAll(subject, "{{ConsecutiveDays}}", ficStreak);
-  subject = replaceAll(subject, "{{GoalStreak}}", goalStreak);
-  subject = replaceAll(subject, "{{GoalWords}}", ficGoal);
+  if (EMAIL_ADDRESS != null && EMAIL_ADDRESS != '') {
+    /* ASSERT: An email address has been provided */
+    
+    /* Process keyword substition for the email subject line */
+    subject = EMAIL_SUBJECT;
+    subject = replaceAll(subject, "{{AlmanacDate}}", almanac_day);
+    subject = replaceAll(subject, "{{TotalWords}}", totalWords);
+    subject = replaceAll(subject, "{{RecordWords}}", ficBest);
+    subject = replaceAll(subject, "{{RecordDate}}", ficBestDate);
+    subject = replaceAll(subject, "{{BlogWords}}", blogWords);
+    subject = replaceAll(subject, "{{TotalDays}}", totalWritingDays);
+    subject = replaceAll(subject, "{{WritingDays}}", writingDays);
+    subject = replaceAll(subject, "{{ConsecutiveDays}}", ficStreak);
+    subject = replaceAll(subject, "{{GoalStreak}}", goalStreak);
+    subject = replaceAll(subject, "{{GoalWords}}", ficGoal);
+    
   
-  
-  // Send the message
-  if (TEST_MODE == 1) 
-    Logger.log("Subject: " + subject);    
-  
-  var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
-  MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
-  
-  if (TEST_MODE == 0 && USE_TUMBLR == 1)
-    MailApp.sendEmail(TUMBLR_EMAIL, tumblr_sub, "", {htmlBody: message});
-  
-  if (TEST_MODE == 1)  
-    Logger.log(message);
+    // Send the message
+    if (TEST_MODE == 1) {
+      Logger.log("Subject: (TEST)" + subject);    
+      subject = "(TEST) " + subject;
+    }
+    var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
+    MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
+    
+    if (TEST_MODE == 0 && USE_TUMBLR == 1)
+      MailApp.sendEmail(TUMBLR_EMAIL, tumblr_sub, "", {htmlBody: message});
+    
+    if (TEST_MODE == 1)  
+      Logger.log(message);
+  } else {
+    /* ASSERT: Email addres is null */
+    Logger.log('Email address is not set. No email sent.');
+  }
 }
+  
 
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");

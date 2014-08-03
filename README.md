@@ -1,6 +1,10 @@
 google-docs-writing-tracker
 ===========================
 
+# Recent changes
+
+* 8/3/14: If an email address is not provided on the Config tab, no email will be sent. This provides an easy way to turn off email. Just clear out the value setting for the email field. I also updated the [master spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing) so that the Email setting is now optional instead of required. Be sure to update your spreadsheet accordingly.
+
 # Overview
 
 The Google Docs Writing Tracker automates the process of logging and tracking how much you write each day:
