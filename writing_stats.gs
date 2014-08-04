@@ -321,7 +321,10 @@ function backupFile(id) {
       }
     }
   }
-  orig.makeCopy(orig.getName()).addToFolder(folder);   
+  /* Create the new file, add it to the almanac folder and remove from the root folder */
+  var newFile = orig.makeCopy(orig.getName());
+  newFile.addToFolder(folder);
+  newfile.removeFromFolder(DocsList.getRootFolder());
   Logger.log("  -> Backed up original file.");
 
 }
