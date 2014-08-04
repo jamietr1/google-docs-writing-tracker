@@ -237,19 +237,26 @@ function getDailyWordCount() {
     }
     message = message + "</body></html>";
     
-    /* Process keyword substitution for the email subject line */
-    subject = EMAIL_SUBJECT;
-    subject = replaceAll(subject, "{{FictionWords}}", words_fiction);
-    subject = replaceAll(subject, "{{NonfictionWords}}", words_nonfiction);
-    subject = replaceAll(subject, "{{WritingDate}}", today);
-    subject = replaceAll(subject, "{{TotalWords}}", words);
-    subject = replaceAll(subject, "{{GoalWords}}", daily_goal);
+    if (EMAIL_ADDRESS != null && EMAIL_ADDRESS != '') {
+      /* ASSERT: Email address provided */
+      
+      /* Process keyword substition for the email subject line */
+      subject = EMAIL_SUBJECT;
+      subject = replaceAll(subject, "{{FictionWords}}", words_fiction);
+      subject = replaceAll(subject, "{{NonfictionWords}}", words_nonfiction);
+      subject = replaceAll(subject, "{{WritingDate}}", today);
+      subject = replaceAll(subject, "{{TotalWords}}", words);
+      subject = replaceAll(subject, "{{GoalWords}}", daily_goal);
     
-    // Send the changes <-- Only send if there was writing!
-    Logger.log("  -> Sending email");
-    if (TEST_MODE == 1)
-      Logger.log(subject);
-    MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});      
+      // Send the changes <-- Only send if there was writing!
+      Logger.log("  -> Sending email");
+      if (TEST_MODE == 1)
+        Logger.log(subject);
+      MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});      
+    } else {
+      /* ASSERT: no email address provided */
+      Logger.log('No email address provided so no email is being sent.');
+    }
   } else {
     Logger.log("  -> Nothing new so no email send.");
   }
@@ -314,7 +321,10 @@ function backupFile(id) {
       }
     }
   }
-  orig.makeCopy(orig.getName()).addToFolder(folder);   
+  /* Create the new file, add it to the almanac folder and remove from the root folder */
+  var newFile = orig.makeCopy(orig.getName());
+  newFile.addToFolder(folder);
+  newfile.removeFromFolder(DocsList.getRootFolder());
   Logger.log("  -> Backed up original file.");
 
 }
