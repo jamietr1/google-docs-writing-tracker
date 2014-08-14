@@ -10,7 +10,6 @@ var SNAPSHOT_FOLDER = loadConfigData("Snapshot Location");
 /* Use the time zone of the current session, which should correspond to the user's
    time zone if their browser settings are correct */
 var TIME_ZONE = Session.getTimeZone();
-
 var SHEET_WRITING = loadConfigData("Writing Sheet");
 var SHEET_GOAL = loadConfigData("Goal Sheet");
 
@@ -39,11 +38,32 @@ var FICTION_TAG = loadConfigData("Fiction Tag");
 var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
 var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
 var MODE = loadConfigData("Word Count Mode");
+var verifiedConfig = 0;
 
 /* Email customization */
 var EMAIL_SUBJECT = loadConfigData("Daily Writing Subject");
 
+function verifySetup() {
+  /* Does a set of checks to make sure the scripts are setup correctly */
   
+  /* Has WRITING_DATA been set */
+  if (WRITING_DATA == "[YOUR FILE ID]") {
+    throw new Error("CONFIGURATION: WRITING_DATA value has not been set. Please set this value to the key ID of your writing spreadsheet.");
+  }
+  
+  /* Do the timezones for the script and spreadsheet match? */
+  Logger.log(TIME_ZONE);
+  var ss_verify = SpreadsheetApp.openById(WRITING_DATA);
+  SS_TZ = ss_verify.getSpreadsheetTimeZone();
+  Logger.log(SS_TZ);
+  
+  if (TIME_ZONE != SS_TZ) {
+    throw new Error("CONFIGURATION: The timezone settings of the writing spreadsheet and scripts do not match.\nPlease ensure both are set to the same timezone. See README for details.\nScript TZ: " + TIME_ZONE + "\nSpreadsheet TZ: " + SS_TZ);
+  }
+  
+  verifiedConfig = 1;
+  
+}  
 
 function find(value, range) {
   var data = range.getValues();
@@ -59,7 +79,16 @@ function find(value, range) {
 
 
 function loadConfigData(setting) {
-  var ss = SpreadsheetApp.openById(WRITING_DATA)
+  if (verifiedConfig == 0) {
+    verifySetup();
+  }
+ 
+  try {
+    var ss = SpreadsheetApp.openById(WRITING_DATA);
+  } catch (e) {
+    throw new Error("CONFIGURATION: The writing spreadsheet with ID '" + WRITING_DATA + "' does not exist. Please point to a valid spreadsheet key.");    
+  }
+  
   var config_sheet = ss.getSheetByName("Config");
   var last_row = config_sheet.getLastRow();
   var range = config_sheet.getRange("A2:B" + last_row);

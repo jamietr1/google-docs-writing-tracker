@@ -35,6 +35,7 @@ var EMAIL_SUBJECT = loadConfigData("Almanac Subject");
 /* Execution Parameters */
 var MODE = loadConfigData("Word Count Mode");
 var REPORT_BLOGGING = loadConfigData("Include Blogging");
+var verifiedConfig = 0;
                             
 var error_count = 0;
 var OFFSET_DAYS = loadConfigData("Offset Days");
@@ -49,8 +50,39 @@ if (TEST_MODE == 1)
 
 /* ===================================================================================================================== */
 
+function verifySetup() {
+  /* Does a set of checks to make sure the scripts are setup correctly */
+  
+  /* Has WRITING_DATA been set */
+  if (WRITING_DATA == "[YOUR FILE ID]") {
+    throw new Error("CONFIGURATION: WRITING_DATA value has not been set. Please set this value to the key ID of your writing spreadsheet.");
+  }
+  
+  /* Do the timezones for the script and spreadsheet match? */
+  Logger.log(TIME_ZONE);
+  var ss_verify = SpreadsheetApp.openById(WRITING_DATA);
+  SS_TZ = ss_verify.getSpreadsheetTimeZone();
+  Logger.log(SS_TZ);
+  
+  if (TIME_ZONE != SS_TZ) {
+    throw new Error("CONFIGURATION: The timezone settings of the writing spreadsheet and scripts do not match.\nPlease ensure both are set to the same timezone. See README for details.\nScript TZ: " + TIME_ZONE + "\nSpreadsheet TZ: " + SS_TZ);
+  }
+  
+  verifiedConfig = 1;
+  
+}  
+
 function loadConfigData(setting) {
-  var ss = SpreadsheetApp.openById(WRITING_DATA)
+    if (verifiedConfig == 0) {
+    verifySetup();
+  }
+ 
+  try {
+    var ss = SpreadsheetApp.openById(WRITING_DATA);
+  } catch (e) {
+    throw new Error("CONFIGURATION: The writing spreadsheet with ID '" + WRITING_DATA + "' does not exist. Please point to a valid spreadsheet key.");    
+  }
+  
   var config_sheet = ss.getSheetByName("Config");
   var last_row = config_sheet.getLastRow();
   var range = config_sheet.getRange("A2:B" + last_row);

@@ -4,6 +4,7 @@ google-docs-writing-tracker
 # Recent changes
 
 * 8/3/14: If an email address is not provided on the Config tab, no email will be sent. This provides an easy way to turn off email. Just clear out the value setting for the email field. I also updated the [master spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing) so that the Email setting is now optional instead of required. Be sure to update your spreadsheet accordingly.
+* 8/10/14: A simple configuration verification system as been added to check for common problems to help users troubleshoot what might be wrong with their setup.
 
 # Overview
 
@@ -14,10 +15,6 @@ The Google Docs Writing Tracker automates the process of logging and tracking ho
   * It generates a Daily Writing Almanac message that summarizes your writing stats, including streaks and records.
   
 The Google Docs Writing Tracking is designed for those who do their writing in Google Docs.
-
-# Beta version
-
-This branch contains a beta version of the Google Docs Writing Tracker that is an extensive refactoring of the original. While I have tested this code in my environment, I am looking to see how it runs in other environments. Things may be buggy. If you run into an issue with the code or these instructions, please open up an issue.
 
 # A note on the (lack of) support
 
