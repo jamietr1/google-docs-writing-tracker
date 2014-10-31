@@ -3,8 +3,9 @@ google-docs-writing-tracker
 
 # Recent changes
 
-* 8/3/14: If an email address is not provided on the Config tab, no email will be sent. This provides an easy way to turn off email. Just clear out the value setting for the email field. I also updated the [master spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing) so that the Email setting is now optional instead of required. Be sure to update your spreadsheet accordingly.
+* 10/31/14: You can now use text based files (.txt, .md, .html, etc.) for your writing instead of Google Docs files. These files must be stored in your Sandbox folder on your Google Drive. Files of these types will be included in word counts. For now, however, only .md (markdown) files edited in Sublime Text are counted as part of the writing time for folks who have integrated with RescueTime.
 * 8/10/14: A simple configuration verification system as been added to check for common problems to help users troubleshoot what might be wrong with their setup.
+* 8/3/14: If an email address is not provided on the Config tab, no email will be sent. This provides an easy way to turn off email. Just clear out the value setting for the email field. I also updated the [master spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing) so that the Email setting is now optional instead of required. Be sure to update your spreadsheet accordingly.
 
 # Overview
 
@@ -14,13 +15,13 @@ The Google Docs Writing Tracker automates the process of logging and tracking ho
   * It generates an email showing what you wrote, including differences from the previous day.
   * It generates a Daily Writing Almanac message that summarizes your writing stats, including streaks and records.
   
-The Google Docs Writing Tracking is designed for those who do their writing in Google Docs.
+The Google Docs Writing Tracking is designed primarily for those who do their writing in Google Docs. However, I recently modified the code to allow any kind of text-based files to be tracked as well. So plain text files, markdown files, HTML, or any other file type that is plain text (not .DOC or DOCX, for instance) will work with the system.
 
 # A note on the (lack of) support
 
 Keep in mind that I originally developed this code for me, without thinking others would be using it. If it seems cumbersome to setup, sorry! Also, **USE IT AT YOUR OWN RISK** It works well for me, but I've been using it for over a year and it was designed around my work-style. People have asked that I make the code available, and I have done that, but I have no time to support it. Feel free to email me at feedback [at] jamietoddrubin dot com with questions, but there is no guarantee that I will be able to reply, or answer the questions. Again, sorry about this.
 
-# New features in the beta-version-2 branch
+# New features 
 
 * Application completely refactored to be much more data-driven, making the setup and execution much easier.
 * New base version of the Writing spreadsheet [available here](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing).
@@ -230,6 +231,11 @@ Once everything is properly installed, you only need to do 2 things:
 2. Write.
 
 Each night, the scripts will look into your Sandbox folder for any Document files that have changed on that day. For each file that has changed, it will check to see if an earlier version exists in the snapshot folder. If it does, It will compared the two files, to get a word count for today. If no earlier version exists, it simply counts the words in the Sandbox version. It repeats this for all modified files.
+
+You may do your writing in tools other than Google Docs, so long as the following criteria are met:
+
+1. The files are plain text (.txt, markdown files, HTML, etc.). Word documents will not work.
+2. The plain text files are stored in your Sandbox folder.
 
 Once the words have been tallied, they are written to a new row on the Writing tab of the spreadsheet, and a summary of the changes, including differences from previous version is sent to the email address you specify in your configuration settings.
 

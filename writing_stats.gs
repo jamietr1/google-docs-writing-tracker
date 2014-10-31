@@ -1,6 +1,6 @@
 var daily_diff = "";
 var error_count = 0;
-var WRITING_DATA = "[YOUR FILE ID]";                              
+var WRITING_DATA = "[INSERT YOUR SPREADSHEET ID]";                              
 
 var TEST_MODE = loadConfigData("Test Mode");
 var EMAIL_ADDRESS = loadConfigData("Email Address");
@@ -108,7 +108,12 @@ function loadConfigData(setting) {
 
 function testHarness()
 {
-  getDailyWordCount(8, 1, 2014);
+  getDailyWordCount(10, 30, 2014);
+}
+
+function testRescueTime()
+{
+  getWritingTime("2014-10-29");
 }
 
 function initializeWritingStats() 
@@ -148,7 +153,12 @@ function getDailyWordCount() {
   var copy_folder = DocsList.getFolder(SNAPSHOT_FOLDER);
   
   /* Corrects Issue 2: gets only Document files */
-  var files = folder.getFilesByType(DocsList.FileType.DOCUMENT);
+  var doc_files = folder.getFilesByType(DocsList.FileType.DOCUMENT);
+  var alt_files = folder.getFilesByType(DocsList.FileType.OTHER);
+  var files = doc_files.concat(alt_files);
+  
+  
+  
   
   if (arguments.length == 3) {
     /* ASSERT: month, day and year provided. This is almost always called from the testHarness() function */
@@ -332,6 +342,35 @@ function getWritingTime(rt_date) {
     if (gDoc.indexOf("Google Docs")>0)
       totalSeconds += result_rows[i][1];
   }
+  
+  /* Now look for Submlime text editing markdown files */
+  thing = "sublime+text";
+  var URL = "https://www.rescuetime.com/anapi/data?";
+  URL += "key=" + RESCUETIME_TOKEN;
+  URL += "&format=" + api_format;
+  URL += "&perspective=" + perspective;
+  URL += "&rs=" + resolution;
+  URL += "&rb=" + rt_date;
+  URL += "&rk=" + kind;
+  URL += "&rt=" + thing;
+  response = UrlFetchApp.fetch(URL).getContentText();
+  dataAll = JSON.parse(response);
+  
+  if (TEST_MODE == 1) {
+    Logger.log(URL);
+    Logger.log(dataAll.rows);
+  }
+  
+  result_rows = dataAll.rows;
+  for (i=0; i< result_rows.length; i++) {
+    var gDoc = result_rows[i][3];
+    if (gDoc.indexOf(".md")>0)
+      totalSeconds += result_rows[i][1];
+  }
+  
+  if (TEST_MODE == 1) {
+    Logger.log(totalSeconds/60);
+  }
   return totalSeconds/60;
 }
 
@@ -372,9 +411,15 @@ function doesFileExistByName(folder, name) {
 }
 
 function getFileDiff(id) {
-  var doc = DocumentApp.openById(id);
-  var name = doc.getName();
-  var doc1 = doc.getText();
+  if (DocsList.getFileById(id).getType() == DocsList.FileType.OTHER) {
+    var doc1 = DocsList.getFileById(id).getContentAsString();
+    var name = DocsList.getFileById(id).getName();
+  } else {
+    var doc = DocumentApp.openById(id);
+    var name = doc.getName();
+    var doc1 = doc.getText();
+  }
+  
   var count = getWordCount(doc1);
   var diff = "";
   
@@ -386,8 +431,13 @@ function getFileDiff(id) {
     var files = folder.getFiles();
     for (f in files) {
       if (files[f].getName() == name) {
-        var prev_doc = DocumentApp.openById(files[f].getId());
-        var doc2 = prev_doc.getText();
+        if (DocsList.getFileById(files[f].getId()).getType() == DocsList.FileType.OTHER) {
+          var doc2 = DocsList.getFileById(files[f].getId()).getContentAsString();
+        } else {
+          var prev_doc = DocumentApp.openById(files[f].getId());
+          var doc2 = prev_doc.getText();
+        }
+        
         var diff = WDiffString(doc2, doc1)     
         if (diff == doc1) {
           diff = "";
@@ -407,8 +457,15 @@ function getFileDiff(id) {
 }
 
 function getWritingType(id) {
-  var doc = DocumentApp.openById(id);
-  var doc_text = doc.getText();
+  if (DocsList.getFileById(id).getType() == DocsList.FileType.OTHER) {
+    Logger.log("Got an MD file!");
+    var doc_text = DocsList.getFileById(id).getContentAsString();
+    Logger.log(doc_text)
+  } else {
+    var doc = DocumentApp.openById(id);
+    var doc_text = doc.getText();
+  }
+  
   var search_for = FICTION_TAG;
   var index = -1;
   var result = "";
@@ -446,9 +503,17 @@ function getWritingType(id) {
 
 
 function getFileWordCount(id) {
-  var doc = DocumentApp.openById(id);
-  var name = doc.getName();
-  var doc1 = doc.getText();
+  if (DocsList.getFileById(id).getType() == DocsList.FileType.OTHER) {
+    Logger.log("Got an MD file!");
+    var doc1 = DocsList.getFileById(id).getContentAsString();
+    var name = DocsList.getFileById(id).getName();
+    Logger.log(doc1);
+  } else {
+    var doc = DocumentApp.openById(id);
+    var doc1 = doc.getText();  
+    var name = doc.getName();
+  }  
+  
   var count = getWordCount(doc1);
   if (TEST_MODE == 1)
     Logger.log("Word count for " + name + " is " + count);
@@ -461,8 +526,14 @@ function getFileWordCount(id) {
     for (f in files) {
       if (files[f].getName() == name)
       {
-        var prev_doc = DocumentApp.openById(files[f].getId());
-        var doc2 = prev_doc.getText();
+        Logger.log("Found file " + name + " in snapshot folder");
+        if (DocsList.getFileById(files[f].getId()).getType() == DocsList.FileType.OTHER) {
+          var doc2 = DocsList.getFileById(files[f].getId()).getContentAsString();
+        } else {
+          var prev_doc = DocumentApp.openById(files[f].getId());
+          var doc2 = prev_doc.getText();
+        }
+        
         var prev_count = getWordCount(doc2);
         if (TEST_MODE == 1)
           Logger.log("Word count for snapshot of " + name + " is " + prev_count);
