@@ -7,9 +7,12 @@ var EMAIL_ADDRESS = loadConfigData("Email Address");
 var SANDBOX = loadConfigData("Sandbox Location");
 var SNAPSHOT_FOLDER = loadConfigData("Snapshot Location");
 
+var SANDBOX_ID = DriveApp.getFoldersByName(SANDBOX).next().getId();
+var SNAPSHOT_ID = DriveApp.getFoldersByName(SNAPSHOT_FOLDER).next().getId();
+
 /* Use the time zone of the current session, which should correspond to the user's
    time zone if their browser settings are correct */
-var TIME_ZONE = Session.getTimeZone();
+var TIME_ZONE = Session.getScriptTimeZone();
 var SHEET_WRITING = loadConfigData("Writing Sheet");
 var SHEET_GOAL = loadConfigData("Goal Sheet");
 
@@ -36,6 +39,7 @@ var WRITING_TIME = loadConfigData("Writing Time");
 /* Execution parameters */
 var FICTION_TAG = loadConfigData("Fiction Tag");
 var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
+var PROJECT_TAG = loadConfigData("Project Tag");
 var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
 var MODE = loadConfigData("Word Count Mode");
 var verifiedConfig = 0;
@@ -108,7 +112,7 @@ function loadConfigData(setting) {
 
 function testHarness()
 {
-  getDailyWordCount(10, 30, 2014);
+  getDailyWordCount(1, 24, 2015);
 }
 
 function testRescueTime()
@@ -149,17 +153,26 @@ function getDailyWordCount() {
   
   
   daily_diff = "";
-  var folder = DocsList.getFolder(SANDBOX);
-  var copy_folder = DocsList.getFolder(SNAPSHOT_FOLDER);
+  //SANDBOX_ID = DriveApp.getFoldersByName(SANDBOX).next().getId();
+  //SNAPSHOT_ID = DriveApp.getFoldersByName(SNAPSHOT_FOLDER).next().getId();
+  
+  var folder = DriveApp.getFolderById(SANDBOX_ID);
+  var copy_folder = DriveApp.getFolderById(SNAPSHOT_ID);
+  
   
   /* Corrects Issue 2: gets only Document files */
-  var doc_files = folder.getFilesByType(DocsList.FileType.DOCUMENT);
-  var alt_files = folder.getFilesByType(DocsList.FileType.OTHER);
-  var files = doc_files.concat(alt_files);
+  var doc_files = folder.getFilesByType(MimeType.GOOGLE_DOCS);
+  var doc_txt_files = folder.getFilesByType(MimeType.PLAIN_TEXT);
+  var files = [];
+  while (doc_files.hasNext()) {
+    files.push(doc_files.next());
+  }
   
+  while (doc_txt_files.hasNext()) {
+    files.push(doc_txt_files.next());
+  }
   
-  
-  
+    
   if (arguments.length == 3) {
     /* ASSERT: month, day and year provided. This is almost always called from the testHarness() function */
     var pMonth = arguments[0];
@@ -354,31 +367,40 @@ function getWritingTime(rt_date) {
   URL += "&rk=" + kind;
   URL += "&rt=" + thing;
   response = UrlFetchApp.fetch(URL).getContentText();
-  dataAll = JSON.parse(response);
   
-  if (TEST_MODE == 1) {
-    Logger.log(URL);
-    Logger.log(dataAll.rows);
+  var rt_error = 0;
+  
+  try {
+    dataAll = JSON.parse(response);
+  } catch (e) {
+    rt_error = 1
   }
   
-  result_rows = dataAll.rows;
-  for (i=0; i< result_rows.length; i++) {
-    var gDoc = result_rows[i][3];
-    if (gDoc.indexOf(".md")>0)
-      totalSeconds += result_rows[i][1];
-  }
+  if (rt_error == 0) {
+    if (TEST_MODE == 1) {
+      Logger.log(URL);
+      Logger.log(dataAll.rows);
+    }
   
-  if (TEST_MODE == 1) {
-    Logger.log(totalSeconds/60);
+    result_rows = dataAll.rows;
+    for (i=0; i< result_rows.length; i++) {
+      var gDoc = result_rows[i][3];
+      if (gDoc.indexOf(".md")>0)
+        totalSeconds += result_rows[i][1];
+    }
+  
+    if (TEST_MODE == 1) {
+      Logger.log(totalSeconds/60);
+    }
   }
   return totalSeconds/60;
 }
 
 function backupFile(id) {
-  var folder = DocsList.getFolder(SNAPSHOT_FOLDER);
-  var orig = DocsList.getFileById(id);
+  var folder = DriveApp.getFolderById(SNAPSHOT_ID);
+  var orig = DriveApp.getFileById(id)
   Logger.log("  -> Backing up " + orig.getName() + " to " + folder.getName() + "...");
-  if (doesFileExistByName(SNAPSHOT_FOLDER, orig.getName())){
+  if (doesFileExistByName(SNAPSHOT_ID, orig.getName())){
     var files = folder.getFiles();
     for (f in files) {
       if (files[f].getName() == orig.getName()) {
@@ -398,22 +420,24 @@ function backupFile(id) {
 }
 
 function doesFileExistByName(folder, name) {
+  Logger.log(folder);
   var found = false;
-  var list = DocsList.getFolder(folder);
+  var list = DriveApp.getFolderById(folder);
   var files = list.getFiles();
-  for (f in files) {
-    if ((files[f].getName() == name) && (files[f].isTrashed() == false)) {
+  while (files.hasNext()) {
+    var file = files.next();
+    if ((file.getName() == name) && (file.isTrashed() == false)) {
       found = true;
       break;
     }
-  }
+  }    
   return found;
 }
 
 function getFileDiff(id) {
-  if (DocsList.getFileById(id).getType() == DocsList.FileType.OTHER) {
-    var doc1 = DocsList.getFileById(id).getContentAsString();
-    var name = DocsList.getFileById(id).getName();
+  if (DriveApp.getFileById(id).getMimeType() == MimeType.PLAIN_TEXT) {
+    var doc1 = DriveApp.getFileById(id).getBlob().getDataAsString();
+    var name = DriveApp.getFileById(id).getName();
   } else {
     var doc = DocumentApp.openById(id);
     var name = doc.getName();
@@ -425,16 +449,17 @@ function getFileDiff(id) {
   
   // Is there a file from which to compare?
   Logger.log("  -> Checking file diff for " + name + "...");
-  var folder = DocsList.getFolder(SNAPSHOT_FOLDER);
-  if (doesFileExistByName(SNAPSHOT_FOLDER, name)) {
+  var folder = DriveApp.getFolderById(SNAPSHOT_ID)
+  if (doesFileExistByName(SNAPSHOT_ID, name)) {
     Logger.log("  -> An earlier version of the file exists...");
     var files = folder.getFiles();
-    for (f in files) {
-      if (files[f].getName() == name) {
-        if (DocsList.getFileById(files[f].getId()).getType() == DocsList.FileType.OTHER) {
-          var doc2 = DocsList.getFileById(files[f].getId()).getContentAsString();
+    while (files.hasNext()) {
+      var file = files.next();
+      if (file.getName() == name) {
+        if (DriveApp.getFileById(file.getId()).getMimeType() == MimeType.PLAIN_TEXT) {
+          var doc2 = DriveApp.getFileById(file.getId()).getBlob().getDataAsString();
         } else {
-          var prev_doc = DocumentApp.openById(files[f].getId());
+          var prev_doc = DocumentApp.openById(file.getId());
           var doc2 = prev_doc.getText();
         }
         
@@ -457,9 +482,9 @@ function getFileDiff(id) {
 }
 
 function getWritingType(id) {
-  if (DocsList.getFileById(id).getType() == DocsList.FileType.OTHER) {
+  if (DriveApp.getFileById(id).getMimeType() == MimeType.PLAIN_TEXT) {
     Logger.log("Got an MD file!");
-    var doc_text = DocsList.getFileById(id).getContentAsString();
+    var doc_text = DriveApp.getFileById(id).getBlob().getDataAsString();
     Logger.log(doc_text)
   } else {
     var doc = DocumentApp.openById(id);
@@ -503,10 +528,10 @@ function getWritingType(id) {
 
 
 function getFileWordCount(id) {
-  if (DocsList.getFileById(id).getType() == DocsList.FileType.OTHER) {
-    Logger.log("Got an MD file!");
-    var doc1 = DocsList.getFileById(id).getContentAsString();
-    var name = DocsList.getFileById(id).getName();
+  if (DriveApp.getFileById(id).getMimeType() == MimeType.PLAIN_TEXT) {
+    Logger.log("Got a plain text file!");
+    var doc1 = DriveApp.getFileById(id).getBlob().getDataAsString();
+    var name = DriveApp.getFileById(id).getName();
     Logger.log(doc1);
   } else {
     var doc = DocumentApp.openById(id);
@@ -520,17 +545,18 @@ function getFileWordCount(id) {
   var diff = "";
   
   // Does an earlier version exist?
-  var folder = DocsList.getFolder(SNAPSHOT_FOLDER);
-  if (doesFileExistByName(SNAPSHOT_FOLDER, name)) {
+  var folder = DriveApp.getFolderById(SNAPSHOT_ID);
+  if (doesFileExistByName(SNAPSHOT_ID, name)) {
     var files = folder.getFiles();
-    for (f in files) {
-      if (files[f].getName() == name)
-      {
+    while (files.hasNext()) {
+      var file = files.next();
+      if (file.getName() == name) {
         Logger.log("Found file " + name + " in snapshot folder");
-        if (DocsList.getFileById(files[f].getId()).getType() == DocsList.FileType.OTHER) {
-          var doc2 = DocsList.getFileById(files[f].getId()).getContentAsString();
+        if (DriveApp.getFileById(file.getId()).getMimeType() == MimeType.PLAIN_TEXT) {
+          var doc2 = DriveApp.getFileById(file.getId()).getBlob().getDataAsString();
+          var doc2 = DocsList.getFileById(file.getId()).getContentAsString();
         } else {
-          var prev_doc = DocumentApp.openById(files[f].getId());
+          var prev_doc = DocumentApp.openById(file.getId());
           var doc2 = prev_doc.getText();
         }
         
@@ -538,6 +564,7 @@ function getFileWordCount(id) {
         if (TEST_MODE == 1)
           Logger.log("Word count for snapshot of " + name + " is " + prev_count);
         count -= prev_count;
+        
       }
     }
   } else {

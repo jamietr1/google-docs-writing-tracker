@@ -1,4 +1,4 @@
-/* ===================================================================================================================== */
+/* =========================================================================== */
 
 /* User-specific information */
 
@@ -6,7 +6,7 @@ var WRITING_DATA = "[YOUR FILE ID]";  // ID to your writing stats spreadsheet
 
 var TEST_MODE = loadConfigData("Test Mode");
 var EMAIL_ADDRESS = loadConfigData("Email Address");
-var TIME_ZONE = Session.getTimeZone();
+var TIME_ZONE = Session.getScriptTimeZone();
 
 var WRITING_SHEET = loadConfigData("Writing Sheet");
 var DATA_SHEET = loadConfigData("Data Sheet");
@@ -48,7 +48,7 @@ if (TEST_MODE == 1)
 
 
 
-/* ===================================================================================================================== */
+/* =========================================================================== */
 
 function verifySetup() {
   /* Does a set of checks to make sure the scripts are setup correctly */

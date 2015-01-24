@@ -3,6 +3,7 @@ google-docs-writing-tracker
 
 # Recent changes
 
+* 01/24/15: Code was refactored to use DriveApp objects instead of DocsList objects. The latter were deprecated back in December, and while the functions still work, I wanted to make sure the code was up to current standards for Google App Scripts. There should be no deprecated code left in the code base. If you see any, let me know about it. One change is required in the spreadsheet config tab. The location of the Snapshot folder should refer only to the folder name rather than the full path. If you had, for instance "Sandbox\Earlier" as your snapshot folder name, it should be changed to "Earlier" for it to work correctly.
 * 10/31/14: You can now use text based files (.txt, .md, .html, etc.) for your writing instead of Google Docs files. These files must be stored in your Sandbox folder on your Google Drive. Files of these types will be included in word counts. For now, however, only .md (markdown) files edited in Sublime Text are counted as part of the writing time for folks who have integrated with RescueTime.
 * 8/10/14: A simple configuration verification system as been added to check for common problems to help users troubleshoot what might be wrong with their setup.
 * 8/3/14: If an email address is not provided on the Config tab, no email will be sent. This provides an easy way to turn off email. Just clear out the value setting for the email field. I also updated the [master spreadsheet](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing) so that the Email setting is now optional instead of required. Be sure to update your spreadsheet accordingly.
@@ -23,6 +24,7 @@ Keep in mind that I originally developed this code for me, without thinking othe
 
 # New features 
 
+* Application refactored to use DriveApp object model instead of the deprecated DocsList model.
 * Application completely refactored to be much more data-driven, making the setup and execution much easier.
 * New base version of the Writing spreadsheet [available here](https://docs.google.com/spreadsheet/ccc?key=0AmEvY6JjICyzdGU3aVFqeGVQX3JNRElaWDJlV2pxdlE&usp=sharing).
 * Ability to break daily word counts into fiction/nonfiction.
@@ -96,6 +98,7 @@ All of the data and settings meta-data for the Google Writing Tracker are now st
    Writing/Sandbox/Earlier  
 
 * You can now call either of this folders whatever you want.
+* Don't include the full path of the Snapshot folder, just the name of the folder itself, .e.g. "Earlier"
 * The email address is where the Daily Writing Summary and Daily Almanac will be sent. If you want these to go into Evernote automatically, use your Evernote email address.
 * Set Test Mode to 1 if you want to run the scripts in test mode. This will still send email, but it will not make updates to the spreadsheet. It will also do some additional logging.
 * Offset Days is the number of days to offset the date the Daily Almanac sends a summary for. If today is **July 31**, the table below gives some examples of how the offset setting works:. 
