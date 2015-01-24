@@ -39,7 +39,6 @@ var WRITING_TIME = loadConfigData("Writing Time");
 /* Execution parameters */
 var FICTION_TAG = loadConfigData("Fiction Tag");
 var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
-var PROJECT_TAG = loadConfigData("Project Tag");
 var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
 var MODE = loadConfigData("Word Count Mode");
 var verifiedConfig = 0;
