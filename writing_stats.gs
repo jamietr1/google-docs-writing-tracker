@@ -396,26 +396,25 @@ function getWritingTime(rt_date) {
 }
 
 function backupFile(id) {
-  var folder = DriveApp.getFolderById(SNAPSHOT_ID);
-  var orig = DriveApp.getFileById(id)
-  Logger.log("  -> Backing up " + orig.getName() + " to " + folder.getName() + "...");
-  if (doesFileExistByName(SNAPSHOT_ID, orig.getName())){
-    var files = folder.getFiles();
-    for (f in files) {
-      if (files[f].getName() == orig.getName()) {
-        // ASSERT: we have a winner!
-        files[f].setTrashed(true);
+  var dest_folder = DriveApp.getFolderById(SNAPSHOT_ID);
+  var orig_file = DriveApp.getFileById(id);
+  Logger.log("  -> Backing up " + orig_file.getName() + " to " + dest_folder.getName() + "...");
+  
+  if (doesFileExistByName(SNAPSHOT_ID, orig_file.getName())) {
+    var files = dest_folder.getFiles();
+    while (files.hasNext()) {
+      var file = files.next();
+      if ((file.getName() == orig_file.getName()) && (file.isTrashed() == false)) {
+        file.setTrashed(true);
         Logger.log("  -> Removed older version to trash...");
         break;
       }
     }
   }
-  /* Create the new file, add it to the almanac folder and remove from the root folder */
-  var newFile = orig.makeCopy(orig.getName());
-  newFile.addToFolder(folder);
-  newFile.removeFromFolder(DocsList.getRootFolder());
-  Logger.log("  -> Backed up original file.");
 
+  var copy_file = DriveApp.getFileById(id).makeCopy(DriveApp.getFileById(id).getName(), DriveApp.getFolderById(SNAPSHOT_ID));
+  var sandbox_folder = DriveApp.getFolderById(SANDBOX_ID);
+  Logger.log("  -> Backed up original file.");
 }
 
 function doesFileExistByName(folder, name) {
