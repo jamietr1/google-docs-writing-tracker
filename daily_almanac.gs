@@ -48,7 +48,7 @@ if (TEST_MODE == 1)
 
 
 
-/* =========================================================================== */
+/* ===================================================================================================================== */
 
 function verifySetup() {
   /* Does a set of checks to make sure the scripts are setup correctly */
@@ -113,6 +113,7 @@ function find(value, range) {
 }
 
 function getAlamancText() {
+  Logger.log("Verifying configuration...");
   if (error_count > 0)
   {
     throw new Error ("Not all required configuration settings have been set. See View->Logs for details.");
@@ -418,6 +419,7 @@ function updateStreak(type, value, goal) {
 }
 
 function getStreakDays(date, type, goal) {  
+  Logger.log("getStreakDays called...");
   if (TEST_MODE == 1)
     Logger.log("getStreakDays called: date=" + date + ", type=" + type + ", goal=" + goal);
   
@@ -451,6 +453,7 @@ function getStreakDays(date, type, goal) {
 
     }  
   }
+  Logger.log("getStreakDays finished...");
 
     return streak;
 
@@ -561,4 +564,5 @@ function updateRanges() {
   //  var range = qs_sheet.getRange("B2:B" + lastRow);
   
   qs_doc.setNamedRange("WordCounts", range);
+  Logger.log("Finished updating ranges.");
 }
