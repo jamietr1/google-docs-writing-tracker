@@ -16,6 +16,7 @@ var TIME_ZONE = Session.getScriptTimeZone();
 var SHEET_WRITING = loadConfigData("Writing Sheet");
 var SHEET_GOAL = loadConfigData("Goal Sheet");
 var SHEET_PROJECT = loadConfigData("Project Sheet");
+var SHEET_PROGRESS = loadConfigData("Progress Sheet");
 
 /* Constants for records tab */
 
@@ -37,16 +38,15 @@ var WRITING_AVERAGE = loadConfigData("Writing Average");
 var WRITING_GOAL = loadConfigData("Writing Goal");
 var WRITING_TIME = loadConfigData("Writing Time");
 
-/* Constants for Projects tab */
-var PROJECT_DATE = loadConfigData("Project Date");
-var PROJECT_NAME = loadConfigData("Project Name");
-var PROJECT_DOC = loadConfigData("Project Doc");
-var PROJECT_WORDS = loadConfigData("Project Words");
+/* Constants for Progress tab */
+var PROGRESS_DATE = loadConfigData("Project Date");
+var PROGRESS_NAME = loadConfigData("Project Name");
+var PROGRESS_DOC = loadConfigData("Project Doc");
+var PROGRESS_WORDS = loadConfigData("Project Words");
 
 /* Execution parameters */
 var FICTION_TAG = loadConfigData("Fiction Tag");
 var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
-var PROJECT_TAG = loadConfigData("Project Tag");
 var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
 var MODE = loadConfigData("Word Count Mode");
 var verifiedConfig = 0;
@@ -119,7 +119,7 @@ function loadConfigData(setting) {
 
 function testHarness()
 {
-  getDailyWordCount(1, 26, 2015);
+  getDailyWordCount(3, 19, 2015);
 }
 
 function testRescueTime()
@@ -205,31 +205,66 @@ function getDailyWordCount() {
   var writing_type = "";
   var moving_average = "";
   var daily_goal = getWritingGoal();
+  var projectName = "";
   
   for (i in files) {
     /* INV: loop through all of the files */
     Logger.log("Checking file: " + files[i].getName() + "...");
     if (today == Utilities.formatDate(files[i].getLastUpdated(), TIME_ZONE, "yyyy-MM-dd")) {
+      /* ASSERT: File was modified today */
       Logger.log("  -> File was modified today. Getting word count...");
+      
+      /* Does this file have a project in the description */
+      if (files[i].getDescription() != "")
+      {
+        /* ASSERT: A file description exists */
+        var fileDesc = JSON.parse(files[i].getDescription());
+        if (TEST_MODE == 1) {
+          Logger.log("    -> File desc: " + files[i].getDescription());
+        }
+        
+        
+        desc_rows = fileDesc.rows;
+        for (i=0; i < desc_rows.length; i++) {
+          var descValue = desc_rows[i][0];
+          Logger.log(descValue);
+          if (descValue != "") {
+            projectName = descValue;
+            break;
+          }
+        }                 
+      }
+      
+      
       if (MODE == 1) {
         writingType = getWritingType(files[i].getId());
         if (writingType == "Fiction") {
-          words_fiction += getFileWordCount(files[i].getId());
+          var file_words = getFileWordCount(files[i].getId());
+          words_fiction += file_words;
           Logger.log("Counted: " + words_fiction + " fiction words");
+          if (projectName != "") {
+            /* ASSERT: this is part of a project */
+            updateProjectProgress(today, projectName, file_words, files[i].getName());
+          }
         } else {
-          words_nonfiction += getFileWordCount(files[i].getId());
+          var file_words = getFileWordCount(files[i].getId());
+          words_nonfiction += file_words;
           Logger.log("Counted: " + words_nonfiction + " nonfiction words.");
+          if (projectName != "") {
+            /* ASSERT: this is part of a project */
+            updateProjectProgress(today, projectName, file_words, files[i].getName());
+          }
         }
       } else {
-        words_fiction += getFileWordCount(files[i].getId()); 
+        var file_words = getFileWordCount(files[i].getId());
+        words_fiction += file_words;
+        if (projectName != "") {
+          /* ASSERT: this is part of a project */
+          updateProjectProgress(today, projectName, file_words, files[i].getName());
+        }
       }
       
       // Grab project-specific info
-      if (PROJECT_TAG != "") {
-        var project_name = getProjectName(files[i].getId());
-        if (TEST_MODE == 1)
-          Logger.log("    -> Got project name of '" + project_name + "' for file '" + files[i].getName() + "'");
-      }
                                                          
       // grab difference for Evernote
       local_diff = getFileDiff(files[i].getId());
@@ -328,6 +363,31 @@ function getDailyWordCount() {
   }
 }
 
+function updateProjectProgress(today, project, words, file) {
+  var qs_doc = SpreadsheetApp.openById(WRITING_DATA);
+  var sheet = qs_doc.getSheetByName(SHEET_PROGRESS);
+  var range = sheet.getLastRow();
+  range++;
+  
+  var dateCell = sheet.getRange(PROGRESS_DATE + range);
+  var nameCell = sheet.getRange(PROGRESS_NAME + range);
+  var wordCell = sheet.getRange(PROGRESS_WORDS + range);
+  var fileCell = sheet.getRange(PROGRESS_DOC + range);
+  
+  if (TEST_MODE == 1) {
+    Logger.log("TEST MODE: Would set " + PROGRESS_DATE + range + " to " + today);
+    Logger.log("TEST MODE: Would set " + PROGRESS_NAME + range + " to " + project);
+    Logger.log("TEST MODE: Would set " + PROGRESS_WORDS + range + " to " + words);
+    Logger.log("TEST MODE: Would set " + PROGRESS_DOC + range + " to " + file);
+  } else {
+    dateCell.setValue(today);
+    nameCell.setValue(project);
+    wordCell.setValue(words);
+    fileCell.setValue(file);
+  }
+}
+
+
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
@@ -375,43 +435,6 @@ function getWritingTime(rt_date) {
       totalSeconds += result_rows[i][1];
     }
   }
-  
-  /* Now look for Submlime text editing markdown files
-  thing = "Writing";
-  var URL = "https://www.rescuetime.com/anapi/data?";
-  URL += "key=" + RESCUETIME_TOKEN;
-  URL += "&format=" + api_format;
-  URL += "&perspective=" + perspective;
-  URL += "&rs=" + resolution;
-  URL += "&rb=" + rt_date;
-  URL += "&re=" + rt_date;
-  URL += "&rk=" + kind;
-  URL += "&rt=" + thing;
-  response = UrlFetchApp.fetch(URL).getContentText();
-  
-  var rt_error = 0;
-  
-  try {
-    dataAll = JSON.parse(response);
-  } catch (e) {
-    rt_error = 1
-  }
-  
-  if (rt_error == 0) {
-    if (TEST_MODE == 1) {
-      Logger.log(URL);
-      Logger.log(dataAll.rows);
-    }
-  
-    result_rows = dataAll.rows;
-    for (i=0; i< result_rows.length; i++) {
-      var gDoc = result_rows[i][3];
-      if (gDoc.indexOf("Sublime Text")>0)
-        totalSeconds += result_rows[i][1];
-    }
-  
-  }
-  */
 
   if (TEST_MODE == 1) {
     Logger.log("Total minutes: " + totalSeconds/60);

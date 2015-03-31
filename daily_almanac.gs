@@ -13,6 +13,7 @@ var DATA_SHEET = loadConfigData("Data Sheet");
 var RECORD_SHEET = loadConfigData("Record Sheet");
 var GOAL_SHEET = loadConfigData("Goal Sheet");
 var BLOGGING_SHEET = loadConfigData("Blogging Sheet");
+var PROJECT_SHEET = loadConfigData("Project Sheet");
 
 /* Spreadsheet constants */
 var RECORD_WRITING_STREAK = loadConfigData("Writing Streak");
@@ -39,9 +40,6 @@ var verifiedConfig = 0;
                             
 var error_count = 0;
 var OFFSET_DAYS = loadConfigData("Offset Days");
-var USE_TUMBLR = loadConfigData("Use Tumblr");
-if (USE_TUMBLR == 1)
-  var TUMBLR_EMAIL = loadConfigData("Tumblr Email");
 
 if (TEST_MODE == 1)
   Logger.log("Detected time zone as: " + TIME_ZONE);
@@ -204,18 +202,8 @@ function getAlamancText() {
     message = message + "<li>Nonfiction: " + nfWords + " words (" + nonFictionPercent.toFixed(1) + "%)</li></ul>";
   }
   
-  // Tumblr message:
-  if (USE_TUMBLR == 1) {
-    tumblr_message = "<p>Fiction/nonfiction</p>";
-    tumblr_message = tumblr_message + "<ul><li>Daily goal: " + ficGoal + " words</li>";
-    tumblr_message = tumblr_message + "<li>Fiction words: " + ficWords;
-    tumblr_message = tumblr_message + "<li>Nonfiction words: " + nfWords;
-  }
-  
   if (totalFicNonFicWords > ficBest) {
     message = message + "<ul><li><font color=\"red\">That is a new 1-day record!</font> (It breaks the previous record of " + ficBest + " words back on " + ficBestDate + ".)</li></ul>";
-    if (USE_TUMBLR == 1)
-      tumblr_message = tumblr_message + "<ul><li><font color=\"red\">New 1-day record!</li></ul>";
     
     // Update the record here
     if (TEST_MODE == 1)
@@ -225,9 +213,6 @@ function getAlamancText() {
   }
   
   message = message + "<li>You have now written for " + writingDays + " out of the last " + totalWritingDays + " days.";
-  if (USE_TUMBLR == 1)
-    tumblr_message = tumblr_message + "</li><li>Have written " + writingDays + " out of " + totalWritingDays + " days</li>";
-  
   message = message + "</li>";
   
   if (totalFicNonFicWords == ficBest) {
@@ -236,13 +221,9 @@ function getAlamancText() {
   
   if (ficStreak > 0) {
     message = message + "<li>You have now written for " + ficStreak + " consecutive days.";
-    if (USE_TUMBLR == 1)
-      tumblr_message = tumblr_message + "<li>Consecutive days: " + ficStreak;
     
     if (ficStreak >= ficBestStreak) {
       message = message + "<ul><li><font color=\"red\">That is a new consecutive-day record!</font></li></ul>";
-      if (USE_TUMBLR == 1)
-        tumblr_message = tumblr_message + "<ul><li><font color=\"red\">New consecutive-day record!</font></li></ul>";
       
       if (TEST_MODE == 1)
         Logger.log("Would update consecutive day streak to " + ficStreak + " days.");
@@ -250,8 +231,6 @@ function getAlamancText() {
         updateStreak("Writing", ficStreak, 0);
     }
     message = message + "</li>";
-    if (USE_TUMBLR == 1)
-      tumblr_message = tumblr_message + "</li>";
   }
   
   if (totalFicNonFicWords == ficGoal) {
@@ -340,10 +319,7 @@ function getAlamancText() {
     }
     var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
     MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
-    
-    if (TEST_MODE == 0 && USE_TUMBLR == 1)
-      MailApp.sendEmail(TUMBLR_EMAIL, tumblr_sub, "", {htmlBody: message});
-    
+        
     if (TEST_MODE == 1)  
       Logger.log(message);
   } else {

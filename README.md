@@ -3,6 +3,8 @@ google-docs-writing-tracker
 
 # Recent changes
 
+* 03/31/15: Added a project management system. This system captures project information using 2 new tabs on the spreadsheet: Projects, which describes the project, and Progress, which tracks the daily progress of the project. TODO: Update the shared template spreadsheet to include these tabs.
+
 * 01/24/15: Code was refactored to use DriveApp objects instead of DocsList objects. The latter were deprecated back in December, and while the functions still work, I wanted to make sure the code was up to current standards for Google App Scripts. There should be no deprecated code left in the code base. If you see any, let me know about it. One change is required in the spreadsheet config tab. The location of the Snapshot folder should refer only to the folder name rather than the full path. If you had, for instance "Sandbox\Earlier" as your snapshot folder name, it should be changed to "Earlier" for it to work correctly.
 * 10/31/14: You can now use text based files (.txt, .md, .html, etc.) for your writing instead of Google Docs files. These files must be stored in your Sandbox folder on your Google Drive. Files of these types will be included in word counts. For now, however, only .md (markdown) files edited in Sublime Text are counted as part of the writing time for folks who have integrated with RescueTime.
 * 8/10/14: A simple configuration verification system as been added to check for common problems to help users troubleshoot what might be wrong with their setup.
