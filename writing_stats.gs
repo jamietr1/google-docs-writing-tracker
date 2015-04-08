@@ -635,7 +635,7 @@ function getFileWordCount(id) {
 function getWordCount(text) {
   text = text.replace(/(^\s*)|(\s*$)/gi,"");
   text = text.replace(/[ ]{2,}/gi," ");
-  text = text.replace(/\n /,"\n"); 
+  text = text.replace(/\n/g," "); 
   return text.split(' ').length;
 }
 
