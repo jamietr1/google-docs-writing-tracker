@@ -15,7 +15,6 @@ var SNAPSHOT_ID = DriveApp.getFoldersByName(SNAPSHOT_FOLDER).next().getId();
 var TIME_ZONE = Session.getScriptTimeZone();
 var SHEET_WRITING = loadConfigData("Writing Sheet");
 var SHEET_GOAL = loadConfigData("Goal Sheet");
-var SHEET_PROJECT = loadConfigData("Project Sheet");
 
 /* Constants for records tab */
 
@@ -37,16 +36,9 @@ var WRITING_AVERAGE = loadConfigData("Writing Average");
 var WRITING_GOAL = loadConfigData("Writing Goal");
 var WRITING_TIME = loadConfigData("Writing Time");
 
-/* Constants for Projects tab */
-var PROJECT_DATE = loadConfigData("Project Date");
-var PROJECT_NAME = loadConfigData("Project Name");
-var PROJECT_DOC = loadConfigData("Project Doc");
-var PROJECT_WORDS = loadConfigData("Project Words");
-
 /* Execution parameters */
 var FICTION_TAG = loadConfigData("Fiction Tag");
 var NONFICTION_TAG = loadConfigData("Nonfiction Tag");
-var PROJECT_TAG = loadConfigData("Project Tag");
 var RESCUETIME_TOKEN = loadConfigData("RescueTime Token");
 var MODE = loadConfigData("Word Count Mode");
 var verifiedConfig = 0;
@@ -223,13 +215,6 @@ function getDailyWordCount() {
       } else {
         words_fiction += getFileWordCount(files[i].getId()); 
       }
-      
-      // Grab project-specific info
-      if (PROJECT_TAG != "") {
-        var project_name = getProjectName(files[i].getId());
-        if (TEST_MODE == 1)
-          Logger.log("    -> Got project name of '" + project_name + "' for file '" + files[i].getName() + "'");
-      }
                                                          
       // grab difference for Evernote
       local_diff = getFileDiff(files[i].getId());
@@ -376,42 +361,7 @@ function getWritingTime(rt_date) {
     }
   }
   
-  /* Now look for Submlime text editing markdown files
-  thing = "Writing";
-  var URL = "https://www.rescuetime.com/anapi/data?";
-  URL += "key=" + RESCUETIME_TOKEN;
-  URL += "&format=" + api_format;
-  URL += "&perspective=" + perspective;
-  URL += "&rs=" + resolution;
-  URL += "&rb=" + rt_date;
-  URL += "&re=" + rt_date;
-  URL += "&rk=" + kind;
-  URL += "&rt=" + thing;
-  response = UrlFetchApp.fetch(URL).getContentText();
-  
-  var rt_error = 0;
-  
-  try {
-    dataAll = JSON.parse(response);
-  } catch (e) {
-    rt_error = 1
-  }
-  
-  if (rt_error == 0) {
-    if (TEST_MODE == 1) {
-      Logger.log(URL);
-      Logger.log(dataAll.rows);
-    }
-  
-    result_rows = dataAll.rows;
-    for (i=0; i< result_rows.length; i++) {
-      var gDoc = result_rows[i][3];
-      if (gDoc.indexOf("Sublime Text")>0)
-        totalSeconds += result_rows[i][1];
-    }
-  
-  }
-  */
+ 
 
   if (TEST_MODE == 1) {
     Logger.log("Total minutes: " + totalSeconds/60);
@@ -502,41 +452,6 @@ function getFileDiff(id) {
   Logger.log("--- ORIG FILE FOLLOWS ---\n" + doc1 + "\n--- ORIG FILE COMPLETE ---");
   return diff;
   
-}
-
-function getProjectName(id) {
-  if ((DriveApp.getFileById(id).getMimeType() == MimeType.PLAIN_TEXT) || (DriveApp.getFileById(id).getMimeType() == MimeType.RTF)) {
-    Logger.log("Got a plain or RTF file!");
-    var doc_text = DriveApp.getFileById(id).getBlob().getDataAsString();
-  } else {
-    var doc = DocumentApp.openById(id);
-    var doc_text = doc.getBlob().getDataAsString();
-  }
-  
-  var search_for = PROJECT_TAG;
-  var index = -1;
-  var expression = "{{" + PROJECT_TAG + "\:(.*)}}";
-  Logger.log(expression);
-  
-  var re = new RegExp("{{" + PROJECT_TAG + "\:(.*)}}");
-  var result = re.exec(doc_text);
-
-  Logger.log(result);
-  if (TEST_MODE == 1) {
-    Logger.log("Value of the lastIndex is: " + re.lastIndex);
-    Logger.log("Value of match is: " + re[0]);
-  }
-
-  return re[0];
-  
-}
-
-function testRegExp() {
-  var doc = "This is a test {{Project:My Project Name}} and more.";
-  var tag = "Project";
-  var re = new RegExp("{{" + tag + "\:(.*)}}");
-  var result = re.exec(doc);
-  Logger.log(result)
 }
 
 function getWritingType(id) {
