@@ -527,7 +527,6 @@ function getFileWordCount(id) {
         Logger.log("Found file " + name + " in snapshot folder");
         if (DriveApp.getFileById(file.getId()).getMimeType() == MimeType.PLAIN_TEXT) {
           var doc2 = DriveApp.getFileById(file.getId()).getBlob().getDataAsString();
-          var doc2 = DocsList.getFileById(file.getId()).getContentAsString();
         } else {
           var prev_doc = DocumentApp.openById(file.getId());
           var doc2 = prev_doc.getText();
