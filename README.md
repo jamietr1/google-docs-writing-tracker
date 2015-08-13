@@ -211,9 +211,9 @@ The triggers are what make the scripts run automatically each night to tally you
 
 ### Installation for existing users
 
-1. Copy the code out of the [daily_almanac.gs](https://raw.githubusercontent.com/jamietr1/google-docs-writing-tracker/beta-version-2/daily_almanac.gs) in this branch.
+1. Copy the code out of the [daily_almanac.gs](https://raw.githubusercontent.com/jamietr1/google-docs-writing-tracker/master/daily_almanac.gs) in this branch.
 2. Paste it into your existing Daily Almanac script, replacing the code that is there.
-3. Copy the code out of the [writing_stats.gs](https://raw.githubusercontent.com/jamietr1/google-docs-writing-tracker/beta-version-2/writing_stats.gs) in this branch.
+3. Copy the code out of the [writing_stats.gs](https://github.com/jamietr1/google-docs-writing-tracker/blob/master/writing_stats.gs) in this branch.
 4. Paste it into your existing WritingStats script, replacing the code that is there.
 
 
