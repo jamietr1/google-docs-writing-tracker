@@ -390,6 +390,12 @@ function backupFile(id) {
   var copy_file = DriveApp.getFileById(id).makeCopy(DriveApp.getFileById(id).getName(), DriveApp.getFolderById(SNAPSHOT_ID));
   var sandbox_folder = DriveApp.getFolderById(SANDBOX_ID);
   Logger.log("  -> Backed up original file.");
+  // Set background to gray, to make it clear it's the backup.
+  if (copy_file.getMimeType() == MimeType.GOOGLE_DOCS) {
+    var doc = DocumentApp.openById(copy_file.getId()).getBody();
+    var txt = doc.editAsText();
+    txt.setBackgroundColor("#cdcdcd")
+  }
 }
 
 function doesFileExistByName(folder, name) {
