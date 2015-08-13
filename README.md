@@ -166,7 +166,7 @@ The following steps install the Google Docs Writing Tracker
 15. Click the Save button.
 16. Click the File menu and select New->Script File...
 17. In the Create File popup, type **diff.gs**.
-18. Open a new browser tab to the [diff.gs](https://github.com/jamietr1/google-docs-writing-tracker/blob/master/daily_almanac.gs) file on GitHub.
+18. Open a new browser tab to the [diff.gs](https://github.com/jamietr1/google-docs-writing-tracker/blob/master/diff.gs) file on GitHub.
 19. Select all of the code and copy it to the clipboard.
 20. Go back to the Google WritingStats project
 21. In the **diff.gs** window, highlight any text that appears there, and the paste in the code you just copied.
@@ -183,7 +183,7 @@ The following steps install the Daily Almanac
 7. From the File menu, select Project Properties...
 8. In the Project Properties dialog, be sure that Time zone setting is set to your local time zone.
 9. Click OK.
-10 Open a new browser tab to the [daily_almanac.gs](https://raw.githubusercontent.com/jamietr1/google-docs-writing-tracker/beta-version-2/daily_almanac.gs) file on GitHub.
+10 Open a new browser tab to the [daily_almanac.gs](https://github.com/jamietr1/google-docs-writing-tracker/blob/master/daily_almanac.gs) file on GitHub.
 11. Select all of the code and copy it to the clipboard.
 12. Go back to the DailyAlmanac project
 13. In the Code.gs window, highlight any text that appears there, and the paste in the code you just copied.
