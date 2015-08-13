@@ -27,6 +27,9 @@ var COL_WRITING_TOTAL = loadConfigData("Writing Total");
 var COL_BLOGGING_TOTAL = loadConfigData("Blogging Total");
 var COL_FICTION = loadConfigData("Writing Fiction");
 var COL_NONFICTION = loadConfigData("Writing Nonfiction");
+var COL_AVERAGE = loadConfigData("Writing Average");
+var COL_GOAL = loadConfigData("Writing Goal");
+var COL_DATES = loadConfigData("Writing Date");
 
 /* Email customization */
 var EMAIL_SUBJECT = loadConfigData("Almanac Subject");
@@ -339,7 +342,28 @@ function getAlamancText() {
       subject = "(TEST) " + subject;
     }
     var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
-    MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
+    // Add charts to email.
+    var sheet = SpreadsheetApp.openById(WRITING_DATA).getSheetByName(WRITING_SHEET);
+    var chartBuilder = sheet.newChart();
+    var lastRow = sheet.getLastRow();
+    var minRow = Math.max(lastRow - 365, 1);
+    
+    var chart = chartBuilder
+        .addRange(sheet.getRange(COL_DATES + minRow + ":" + COL_DATES + lastRow))
+        .addRange(sheet.getRange(COL_WRITING_TOTAL + minRow + ":" + COL_WRITING_TOTAL + lastRow))
+        .addRange(sheet.getRange(COL_AVERAGE + minRow + ":" + COL_AVERAGE + lastRow))
+        .addRange(sheet.getRange(COL_GOAL + minRow + ":" + COL_GOAL + lastRow))
+        .asLineChart()
+        .setOption('title', 'Words Written')
+        .setXAxisTitle('Time')
+        .setXAxisTitle('Words')
+        .setRange(0, 300)
+        .build();
+    var emailImages={};
+    var chartBlobs = new Array(1); 
+    message = message + "<img src='cid:wordsWritten'><br>";
+    emailImages["wordsWritten"] = chart.getAs("image/png").setName("wordsWritten");
+    MailApp.sendEmail({ to: EMAIL_ADDRESS, subject: subject, htmlBody: message, inlineImages: emailImages });
     
     if (TEST_MODE == 0 && USE_TUMBLR == 1)
       MailApp.sendEmail(TUMBLR_EMAIL, tumblr_sub, "", {htmlBody: message});
