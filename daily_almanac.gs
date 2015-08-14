@@ -27,9 +27,13 @@ var COL_WRITING_TOTAL = loadConfigData("Writing Total");
 var COL_BLOGGING_TOTAL = loadConfigData("Blogging Total");
 var COL_FICTION = loadConfigData("Writing Fiction");
 var COL_NONFICTION = loadConfigData("Writing Nonfiction");
+var COL_AVERAGE = loadConfigData("Writing Average");
+var COL_GOAL = loadConfigData("Writing Goal");
+var COL_DATES = loadConfigData("Writing Date");
 
 /* Email customization */
 var EMAIL_SUBJECT = loadConfigData("Almanac Subject");
+var INCLUDE_CHART_IN_EMAIL = loadConfigData("Include Chart in Almanac", 0);
 
 
 /* Execution Parameters */
@@ -73,7 +77,11 @@ function verifySetup() {
 }  
 
 function loadConfigData(setting) {
-    if (verifiedConfig == 0) {
+  loadConfigData(setting, null); 
+}
+
+function loadConfigData(setting, defaultValue) {
+  if (verifiedConfig == 0) {
     verifySetup();
   }
  
@@ -87,9 +95,13 @@ function loadConfigData(setting) {
   var last_row = config_sheet.getLastRow();
   var range = config_sheet.getRange("A2:B" + last_row);
   var row = find(setting, range);
-  if (row == null)
-    throw new Error ("ERROR: Could not find setting '" + setting + "' in the Config tab.");   
-  else {
+  if (row == null) {
+    if (defaultValue == null) {
+      throw new Error ("ERROR: Could not find setting '" + setting + "' in the Config tab.");   
+    } else {
+      row = defaultValue;
+    }
+  } else {
     var row_result = row.getRow();
     var result = config_sheet.getRange("B" + row_result).getValue();
     if (config_sheet.getRange("C" + row_result).getValue() == "Required" && result == "") {
@@ -339,7 +351,33 @@ function getAlamancText() {
       subject = "(TEST) " + subject;
     }
     var tumblr_sub = "Daily Writing Almanac for " + almanac_day;
-    MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
+    
+    if (INCLUDE_CHART_IN_EMAIL == 1) {
+      // Add charts to email.
+      var sheet = SpreadsheetApp.openById(WRITING_DATA).getSheetByName(WRITING_SHEET);
+      var chartBuilder = sheet.newChart();
+      var lastRow = sheet.getLastRow();
+      var minRow = Math.max(lastRow - 365, 1);
+      
+      var chart = chartBuilder
+      .addRange(sheet.getRange(COL_DATES + minRow + ":" + COL_DATES + lastRow))
+      .addRange(sheet.getRange(COL_WRITING_TOTAL + minRow + ":" + COL_WRITING_TOTAL + lastRow))
+      .addRange(sheet.getRange(COL_AVERAGE + minRow + ":" + COL_AVERAGE + lastRow))
+      .addRange(sheet.getRange(COL_GOAL + minRow + ":" + COL_GOAL + lastRow))
+      .asLineChart()
+      .setOption('title', 'Words Written')
+      .setXAxisTitle('Time')
+      .setXAxisTitle('Words')
+      .setRange(0, 300)
+      .build();
+      var emailImages={};
+      var chartBlobs = new Array(1); 
+      message = message + "<img src='cid:wordsWritten'><br>";
+      emailImages["wordsWritten"] = chart.getAs("image/png").setName("wordsWritten");
+      MailApp.sendEmail({ to: EMAIL_ADDRESS, subject: subject, htmlBody: message, inlineImages: emailImages });
+    } else {
+      MailApp.sendEmail(EMAIL_ADDRESS, subject, "", {htmlBody: message});
+    }
     
     if (TEST_MODE == 0 && USE_TUMBLR == 1)
       MailApp.sendEmail(TUMBLR_EMAIL, tumblr_sub, "", {htmlBody: message});

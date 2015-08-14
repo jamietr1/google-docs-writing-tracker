@@ -249,7 +249,8 @@ function getDailyWordCount() {
   var goalCell = sheet.getRange(WRITING_GOAL + range);
   var timeCell = sheet.getRange(WRITING_TIME + range);
   var avgCell = sheet.getRange(WRITING_AVERAGE + range);
-  var avgStart = range - 6;
+  var avgStart = Math.max(2, range - 6);
+  var avgFormula = "=AVERAGE(" + WRITING_TOTAL + avgStart + ":" + WRITING_TOTAL + range + ")"
   
   
   var words = words_fiction + words_nonfiction;
@@ -262,7 +263,7 @@ function getDailyWordCount() {
     }
     Logger.log("TEST MODE: Would set " + WRITING_TOTAL + range + " to " + words);    
     Logger.log("TEST MODE: Would set " + WRITING_TIME + range + " to " + time_total);
-    Logger.log("TEST MODE: Would set " + WRITING_AVERAGE + range + " to =AVERAGE(" + WRITING_TOTAL + avgStart + ":" + WRITING_TOTAL + range + ")");
+    Logger.log("TEST MODE: Would set " + WRITING_AVERAGE + range + " to " + avgFormula);
     Logger.log("TEST MODE: Would set " + WRITING_GOAL + range + " to " + daily_goal);
   } else {
     dateCell.setValue(today);
@@ -273,7 +274,7 @@ function getDailyWordCount() {
     wordCell.setValue(words);    
     timeCell.setValue(time_total);
     goalCell.setValue(daily_goal);
-    avgCell.setFormula("=AVERAGE(" + WRITING_TOTAL + avgStart + ":" + WRITING_TOTAL + range + ")");
+    avgCell.setFormula(avgFormula);
   }
     
   if (daily_diff != "") {
@@ -390,6 +391,12 @@ function backupFile(id) {
   var copy_file = DriveApp.getFileById(id).makeCopy(DriveApp.getFileById(id).getName(), DriveApp.getFolderById(SNAPSHOT_ID));
   var sandbox_folder = DriveApp.getFolderById(SANDBOX_ID);
   Logger.log("  -> Backed up original file.");
+  // Set background to gray, to make it clear it's the backup.
+  if (copy_file.getMimeType() == MimeType.GOOGLE_DOCS) {
+    var doc = DocumentApp.openById(copy_file.getId()).getBody();
+    var txt = doc.editAsText();
+    txt.setBackgroundColor("#cdcdcd")
+  }
 }
 
 function doesFileExistByName(folder, name) {
