@@ -250,6 +250,7 @@ function getDailyWordCount() {
   var timeCell = sheet.getRange(WRITING_TIME + range);
   var avgCell = sheet.getRange(WRITING_AVERAGE + range);
   var avgStart = range - 6;
+  avgStart = Math.max(avgStart, 2); // until we have a week of writing data, average the days recorded so far
   
   
   var words = words_fiction + words_nonfiction;
